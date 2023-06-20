@@ -1,0 +1,6 @@
+com.auth0.domain: your-auth0-domain
+com.auth0.clientId: your-auth0-clientId
+com.auth0.clientSecret: your-auth0-clientSecret
+com.auth0.managementDomain: your-auth0-management-domain
+com.auth0.managementClientId: your-auth0-management-clientId
+com.auth0.managementClientSecret: your-auth0-management-clientSecret
