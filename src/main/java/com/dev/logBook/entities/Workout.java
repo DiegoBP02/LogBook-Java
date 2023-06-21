@@ -25,7 +25,7 @@ public class Workout {
     private LocalDate date;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "workout")
+    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises = new ArrayList<>();
 
     @JsonIgnore

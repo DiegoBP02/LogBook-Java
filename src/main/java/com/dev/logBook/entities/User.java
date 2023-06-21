@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,16 +20,17 @@ public class User {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
-    private String auth0_id;
+    @Column(name = "auth0_id")
+    private String auth0Id;
     private String email;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workout> workouts = new ArrayList<>();
 
     public User (DecodedJWT jwt){
         this.email = getUserEmailFromJwt(jwt);
-        this.auth0_id = getAuth0IdFromJwt(jwt);
+        this.auth0Id = getAuth0IdFromJwt(jwt);
     }
 
     private String getUserEmailFromJwt(DecodedJWT jwt){

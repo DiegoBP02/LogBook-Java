@@ -7,6 +7,8 @@ import com.auth0.Tokens;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.dev.logBook.config.AuthConfig;
+import com.dev.logBook.entities.User;
+import com.dev.logBook.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationController authenticationController;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping(value = "/login")
     protected void login(HttpServletRequest request, HttpServletResponse response)
@@ -46,6 +51,12 @@ public class AuthController {
         authToken2.setAuthenticated(true);
 
         SecurityContextHolder.getContext().setAuthentication(authToken2);
+
+        User user = new User(jwt);
+        if(userService.findByAuth0Id(user.getAuth0Id()) == null){
+            userService.create(user);
+        }
+
         response.sendRedirect(config.getContextPath(request) + "/");
     }
 
