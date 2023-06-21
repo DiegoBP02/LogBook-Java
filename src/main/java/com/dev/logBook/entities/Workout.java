@@ -14,6 +14,7 @@ import java.util.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity(name = "workouts")
 public class Workout {
     @Id
@@ -21,12 +22,11 @@ public class Workout {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     private UUID muscleId;
-    private String exercise;
     private LocalDate date;
 
     @JsonIgnore
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Exercise> exercises = new ArrayList<>();
+    private List<Exercise> exercises;
 
     @JsonIgnore
     @ManyToOne
