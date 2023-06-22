@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity(name = "exercises")
 public class Exercise {
     @Id
@@ -24,7 +23,6 @@ public class Exercise {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     private String name;
-    private UUID muscleId;
     @ElementCollection()
     private List<Set> sets;
 
@@ -32,6 +30,11 @@ public class Exercise {
     @ManyToOne
     @JoinColumn(name = "workout_id")
     private Workout workout;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
 
 

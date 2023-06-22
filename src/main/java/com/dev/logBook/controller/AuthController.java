@@ -53,7 +53,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authToken2);
 
         User user = new User(jwt);
-        if(userService.findByAuth0Id(user.getAuth0Id()) == null){
+        if (userService.findByAuth0Id(user.getAuth0Id()) == null) {
             userService.create(user);
         }
 

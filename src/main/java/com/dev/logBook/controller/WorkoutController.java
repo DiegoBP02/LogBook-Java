@@ -3,35 +3,56 @@ package com.dev.logBook.controller;
 import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.services.WorkoutService;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Controller(value = "/workout")
+@Controller(value = "/workouts")
 public class WorkoutController {
 
     @Autowired
     private WorkoutService workoutService;
 
     @PostMapping
-    public ResponseEntity<Workout> create(@Valid @RequestBody WorkoutDto workoutDTO){}
+    public ResponseEntity<Workout> create(@Valid @RequestBody WorkoutDto workoutDTO) {
+        Workout workout = workoutService.create(workoutDTO);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(workout.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(workout);
+    }
 
     @GetMapping
-    public ResponseEntity<List<Workout>> findAll(){}
+    public ResponseEntity<List<Workout>> findAll() {
+        List<Workout> workouts = workoutService.findAll();
+        return ResponseEntity.ok().body(workouts);
+    }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Workout> findById(@PathVariable UUID id){}
+    public ResponseEntity<Workout> findById(@PathVariable UUID id) {
+        Workout workout = workoutService.findById(id);
+        return ResponseEntity.ok().body(workout);
+    }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Workout> update(@PathVariable UUID id, @Valid @RequestBody WorkoutDto workoutDto){}
+    public ResponseEntity<Workout> update(@PathVariable UUID id, @Valid @RequestBody WorkoutDto workoutDto) {
+        Workout workout = workoutService.update(id, workoutDto);
+        return ResponseEntity.ok().body(workout);
+    }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Workout> delete(@PathVariable UUID id){}
+    public ResponseEntity<Workout> delete(@PathVariable UUID id) {
+        workoutService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }

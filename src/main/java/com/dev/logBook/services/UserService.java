@@ -10,11 +10,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public void create(User user){
+    public void create(User user) {
         userRepository.save(user);
     }
 
-    public User findByAuth0Id(String auth0Id){
+    public User findByAuth0Id(String auth0Id) {
         return userRepository.findByAuth0Id(auth0Id);
     }
 }

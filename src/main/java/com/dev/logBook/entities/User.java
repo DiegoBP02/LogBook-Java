@@ -2,7 +2,6 @@ package com.dev.logBook.entities;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -28,12 +27,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workout> workouts = new ArrayList<>();
 
-    public User (DecodedJWT jwt){
+    public User(DecodedJWT jwt) {
         this.email = getUserEmailFromJwt(jwt);
         this.auth0Id = getAuth0IdFromJwt(jwt);
     }
 
-    private String getUserEmailFromJwt(DecodedJWT jwt){
+    private String getUserEmailFromJwt(DecodedJWT jwt) {
         return jwt.getClaims().get("email").asString();
     }
 

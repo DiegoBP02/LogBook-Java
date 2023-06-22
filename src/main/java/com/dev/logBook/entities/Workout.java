@@ -1,5 +1,6 @@
 package com.dev.logBook.entities;
 
+import com.dev.logBook.enums.Muscles;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +23,7 @@ public class Workout {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
-    private UUID muscleId;
+    private Muscles muscle;
     private LocalDate date;
 
     @JsonIgnore

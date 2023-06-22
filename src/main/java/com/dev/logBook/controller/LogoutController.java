@@ -19,14 +19,14 @@ public class LogoutController implements LogoutSuccessHandler {
     public void onLogoutSuccess(HttpServletRequest req,
                                 HttpServletResponse res,
                                 Authentication auth) throws IOException {
-        if(req.getSession() != null){
+        if (req.getSession() != null) {
             req.getSession().invalidate();
         }
         String returnTo = config.getContextPath(req);
         String logoutUrl = config.getLogoutUrl() + "?client_id=" + config.getClientId() + "&returnTo=" + returnTo;
         try {
             res.sendRedirect(logoutUrl);
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new IOException(e.getMessage());
         }
     }
