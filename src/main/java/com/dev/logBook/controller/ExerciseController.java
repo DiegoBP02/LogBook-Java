@@ -14,7 +14,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Controller(value = "/exercises")
+@Controller
+@RequestMapping(value = "/exercises")
 public class ExerciseController {
 
     @Autowired

@@ -22,7 +22,7 @@ public class LogoutController implements LogoutSuccessHandler {
         if (req.getSession() != null) {
             req.getSession().invalidate();
         }
-        String returnTo = config.getContextPath(req);
+        String returnTo = config.getContextPath(req) + "/home";
         String logoutUrl = config.getLogoutUrl() + "?client_id=" + config.getClientId() + "&returnTo=" + returnTo;
         try {
             res.sendRedirect(logoutUrl);

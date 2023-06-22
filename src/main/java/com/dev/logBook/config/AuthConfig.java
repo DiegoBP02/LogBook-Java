@@ -7,6 +7,8 @@ import com.dev.logBook.controller.LogoutController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -45,11 +47,11 @@ public class AuthConfig {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/callback", "/login", "/").permitAll()
+                .antMatchers("/auth/callback", "/auth/login", "/home").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/auth/login")
                 .and()
                 .logout().logoutSuccessHandler(logoutSuccessHandler()).permitAll();
         return http.build();

@@ -17,4 +17,9 @@ public class UserService {
     public User findByAuth0Id(String auth0Id) {
         return userRepository.findByAuth0Id(auth0Id);
     }
+
+    public User findByRawAuth0Id(String auth0IdRaw) {
+        String auth0Id = auth0IdRaw.substring(auth0IdRaw.lastIndexOf("|") + 1);
+        return userRepository.findByAuth0Id(auth0Id);
+    }
 }

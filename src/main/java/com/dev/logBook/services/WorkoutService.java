@@ -21,6 +21,9 @@ public class WorkoutService {
     @Autowired
     private WorkoutRepository workoutRepository;
 
+    @Autowired
+    private UserService userService;
+
     public Workout create(WorkoutDto workoutDTO) {
         User user = getCurrentUser();
         Workout workout = Workout.builder()
@@ -73,6 +76,8 @@ public class WorkoutService {
     }
 
     private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String rawAuth0Id = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal().toString();
+        return userService.findByRawAuth0Id(rawAuth0Id);
     }
 }

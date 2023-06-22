@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class HomeController {
-    @GetMapping(value = "/")
+    @GetMapping(value = "/home")
     @ResponseBody
     public String home(final Authentication authentication) {
         TestingAuthenticationToken token = (TestingAuthenticationToken) authentication;

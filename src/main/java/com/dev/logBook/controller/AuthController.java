@@ -30,17 +30,17 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(value = "/login")
+    @GetMapping(value = "/auth/login")
     protected void login(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        String redirectUri = "http://localhost:8080/callback";
+        String redirectUri = "http://localhost:8080/auth/callback";
         String authorizeUrl = authenticationController.buildAuthorizeUrl(request, response, redirectUri)
                 .withScope("openid email")
                 .build();
         response.sendRedirect(authorizeUrl);
     }
 
-    @GetMapping(value = "/callback")
+    @GetMapping(value = "/auth/callback")
     public void callback(HttpServletRequest request, HttpServletResponse response)
             throws IdentityVerificationException, IOException {
         Tokens tokens = authenticationController.handle(request, response);
@@ -57,7 +57,7 @@ public class AuthController {
             userService.create(user);
         }
 
-        response.sendRedirect(config.getContextPath(request) + "/");
+        response.sendRedirect(config.getContextPath(request) + "/home");
     }
 
 }
