@@ -1,9 +1,12 @@
 package com.dev.logBook.controller;
 
 import com.dev.logBook.dtos.WorkoutDto;
+import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.services.WorkoutService;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +46,20 @@ public class WorkoutController {
     public ResponseEntity<Workout> findById(@PathVariable UUID id) {
         Workout workout = workoutService.findById(id);
         return ResponseEntity.ok().body(workout);
+    }
+
+    @GetMapping(value = "/date/{date}")
+    public ResponseEntity<Workout> findByDate(@PathVariable
+                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                  LocalDate date) {
+        Workout workout = workoutService.findByDateAndUserId(date);
+        return ResponseEntity.ok().body(workout);
+    }
+
+    @GetMapping(value = "/exercisesOutsideRepRange/{id}")
+    public ResponseEntity<List<Exercise>> getExercisesOutsideRepsRange(@PathVariable UUID id) {
+        List<Exercise> exercises = workoutService.getExercisesOutsideRepsRange(id);
+        return ResponseEntity.ok().body(exercises);
     }
 
     @PatchMapping(value = "/{id}")

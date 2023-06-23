@@ -1,6 +1,7 @@
 package com.dev.logBook.services;
 
 import com.dev.logBook.dtos.WorkoutDto;
+import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.repositories.WorkoutRepository;
@@ -10,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +33,8 @@ public class WorkoutService {
                 .date(workoutDTO.getDate())
                 .muscle(workoutDTO.getMuscle())
                 .user(user)
+                .lowerRepsRange(workoutDTO.getLowerRepsRange())
+                .upperRepsRange(workoutDTO.getUpperRepsRange())
                 .build();
         return workoutRepository.save(workout);
     }
@@ -47,11 +52,17 @@ public class WorkoutService {
         return workout;
     }
 
+    public Workout findByDateAndUserId(LocalDate date) {
+        User user = getCurrentUser();
+        return workoutRepository.findByDateAndUserId(date, user.getId())
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
     public Workout update(UUID id, WorkoutDto workoutDto) {
         try {
             User user = getCurrentUser();
             Workout entity = workoutRepository.getReferenceById(id);
-            checkOwnership(user,  entity.getUser().getId());
+            checkOwnership(user, entity.getUser().getId());
             updateData(entity, workoutDto);
             return workoutRepository.save(entity);
         } catch (EntityNotFoundException e) {
@@ -62,12 +73,26 @@ public class WorkoutService {
     public void delete(UUID id) {
         try {
             User user = getCurrentUser();
-            Workout workout =  workoutRepository.getReferenceById(id);
+            Workout workout = workoutRepository.getReferenceById(id);
             checkOwnership(user, workout.getUser().getId());
             workoutRepository.deleteById(id);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);
         }
+    }
+
+    public List<Exercise> getExercisesOutsideRepsRange(UUID workoutId) {
+        Workout workout = findById(workoutId);
+        List<Exercise> exercises = workout.getExercises();
+        List<Exercise> exercisesOutsideRepsRange = new ArrayList<>();
+        exercises.forEach(exercise -> {
+            if (exercise.getReps() < workout.getLowerRepsRange() ||
+                    exercise.getReps() > workout.getUpperRepsRange()){
+                exercisesOutsideRepsRange.add(exercise);
+            }
+        });
+
+        return exercisesOutsideRepsRange;
     }
 
     private void updateData(Workout entity, WorkoutDto obj) {

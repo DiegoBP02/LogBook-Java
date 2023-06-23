@@ -25,6 +25,8 @@ public class Workout {
     private UUID id;
     private Muscles muscle;
     private LocalDate date;
+    private int lowerRepsRange;
+    private int upperRepsRange;
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises;
