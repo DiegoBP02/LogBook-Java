@@ -43,7 +43,7 @@ public class WorkoutService {
         User user = getCurrentUser();
         Workout workout = workoutRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
-        checkOwnership(user, id);
+        checkOwnership(user, workout.getUser().getId());
         return workout;
     }
 
@@ -51,7 +51,7 @@ public class WorkoutService {
         try {
             User user = getCurrentUser();
             Workout entity = workoutRepository.getReferenceById(id);
-            checkOwnership(user, id);
+            checkOwnership(user,  entity.getUser().getId());
             updateData(entity, workoutDto);
             return workoutRepository.save(entity);
         } catch (EntityNotFoundException e) {
@@ -62,8 +62,8 @@ public class WorkoutService {
     public void delete(UUID id) {
         try {
             User user = getCurrentUser();
-            workoutRepository.getReferenceById(id);
-            checkOwnership(user, id);
+            Workout workout =  workoutRepository.getReferenceById(id);
+            checkOwnership(user, workout.getUser().getId());
             workoutRepository.deleteById(id);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);

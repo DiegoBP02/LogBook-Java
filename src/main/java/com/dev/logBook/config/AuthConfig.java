@@ -47,7 +47,7 @@ public class AuthConfig {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/auth/callback", "/auth/login", "/home").permitAll()
+                .antMatchers("/auth/callback", "/auth/login", "/home","/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

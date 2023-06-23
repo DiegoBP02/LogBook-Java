@@ -1,6 +1,5 @@
 package com.dev.logBook.entities;
 
-import com.dev.logBook.entities.models.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,8 +25,9 @@ public class Exercise {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     private String name;
-    @ElementCollection()
-    private List<Set> sets;
+    private int reps;
+    private int weight;
+    private int rir;
 
     @JsonIgnore
     @ManyToOne

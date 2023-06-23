@@ -31,9 +31,12 @@ public class ExerciseService {
     public Exercise create(ExerciseDto exerciseDto) {
         User user = getCurrentUser();
         Workout workout = workoutService.findById(exerciseDto.getWorkoutId());
+
         Exercise exercise = Exercise.builder()
                 .name(exerciseDto.getName())
-                .sets(exerciseDto.getSets())
+                .weight(exerciseDto.getWeight())
+                .reps(exerciseDto.getReps())
+                .rir(exerciseDto.getRir())
                 .workout(workout)
                 .user(user)
                 .build();
@@ -49,7 +52,7 @@ public class ExerciseService {
         User user = getCurrentUser();
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
-        checkOwnership(user, id);
+        checkOwnership(user, exercise.getUser().getId());
         return exercise;
     }
 
@@ -57,7 +60,7 @@ public class ExerciseService {
         try {
             User user = getCurrentUser();
             Exercise entity = exerciseRepository.getReferenceById(id);
-            checkOwnership(user, id);
+            checkOwnership(user, entity.getUser().getId());
             updateData(entity, exerciseDto);
             return exerciseRepository.save(entity);
         } catch (EntityNotFoundException e) {
@@ -68,8 +71,8 @@ public class ExerciseService {
     public void delete(UUID id) {
         try {
             User user = getCurrentUser();
-            exerciseRepository.getReferenceById(id);
-            checkOwnership(user, id);
+            Exercise exercise = exerciseRepository.getReferenceById(id);
+            checkOwnership(user, exercise.getUser().getId());
             exerciseRepository.deleteById(id);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(id);
@@ -78,7 +81,9 @@ public class ExerciseService {
 
     private void updateData(Exercise entity, ExerciseDto obj) {
         entity.setName(obj.getName());
-        entity.setSets(obj.getSets());
+        entity.setWeight(obj.getWeight());
+        entity.setReps(obj.getReps());
+        entity.setRir(obj.getRir());
     }
 
     private User getCurrentUser() {

@@ -26,11 +26,9 @@ public class Workout {
     private Muscles muscle;
     private LocalDate date;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

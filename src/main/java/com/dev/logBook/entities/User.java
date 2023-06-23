@@ -20,7 +20,9 @@ public class User {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     @Column(name = "auth0_id")
+    @JsonIgnore
     private String auth0Id;
+    @JsonIgnore
     private String email;
 
     @JsonIgnore
