@@ -15,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,6 +61,12 @@ public class WorkoutController {
     public ResponseEntity<List<Exercise>> getExercisesOutsideRepsRange(@PathVariable UUID id) {
         List<Exercise> exercises = workoutService.getExercisesOutsideRepsRange(id);
         return ResponseEntity.ok().body(exercises);
+    }
+
+    @GetMapping(value = "/volumeLoad/{id}")
+    public ResponseEntity<HashMap<String, Integer>> getVolumeLoad(@PathVariable UUID id) {
+        HashMap<String, Integer> result = workoutService.calculateVolumeLoad(id);
+        return ResponseEntity.ok().body(result);
     }
 
     @PatchMapping(value = "/{id}")

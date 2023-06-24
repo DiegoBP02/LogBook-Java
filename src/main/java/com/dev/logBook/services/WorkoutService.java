@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,6 +94,26 @@ public class WorkoutService {
         });
 
         return exercisesOutsideRepsRange;
+    }
+
+    public HashMap<String, Integer> calculateVolumeLoad(UUID workoutId){
+        Workout workout = findById(workoutId);
+        List<Exercise> exercises = workout.getExercises();
+        HashMap<String, Integer> result = new HashMap<>();
+        exercises.forEach(exercise -> {
+            String name = exercise.getName();
+            int weight = exercise.getWeight();
+            int reps = exercise.getReps();
+            int volume = weight * reps;
+
+            if(result.containsKey(name)){
+                int previousVolume = result.get(name);
+                volume += previousVolume;
+            }
+
+            result.put(name, volume);
+        });
+        return result;
     }
 
     private void updateData(Workout entity, WorkoutDto obj) {
