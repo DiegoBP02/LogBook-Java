@@ -1,76 +1,49 @@
 package com.dev.logBook.config;
 
-import com.auth0.AuthenticationController;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwk.JwkProviderBuilder;
-import com.dev.logBook.controller.LogoutController;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
 public class AuthConfig {
-    @Value(value = "${com.auth0.domain}")
-    private String domain;
-
-    @Value(value = "${com.auth0.clientId}")
-    private String clientId;
-
-    @Value(value = "${com.auth0.clientSecret}")
-    private String clientSecret;
+    @Autowired
+    private FilterToken filterToken;
 
     @Bean
-    public LogoutSuccessHandler logoutSuccessHandler() {
-        return new LogoutController();
-    }
-
-    @Bean
-    public AuthenticationController authenticationController() throws UnsupportedEncodingException {
-        JwkProvider jwkProvider = new JwkProviderBuilder(domain).build();
-        return AuthenticationController.newBuilder(domain, clientId, clientSecret)
-                .withJwkProvider(jwkProvider)
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().authorizeHttpRequests()
+                .antMatchers(HttpMethod.POST, "/auth/login", "/auth/register")
+                .permitAll()
+                .anyRequest().authenticated()
+                .and().addFilterBefore(filterToken, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .authorizeRequests()
-                .antMatchers("/auth/callback", "/auth/login", "/home","/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/auth/login")
-                .and()
-                .logout().logoutSuccessHandler(logoutSuccessHandler()).permitAll();
-        return http.build();
+    public AuthenticationManager authenticationManager
+            (AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    public String getContextPath(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getLogoutUrl() {
-        return "https://" + getDomain() + "/v2/logout";
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }

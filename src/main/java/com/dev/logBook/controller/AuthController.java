@@ -1,63 +1,39 @@
 package com.dev.logBook.controller;
 
 
-import com.auth0.AuthenticationController;
-import com.auth0.IdentityVerificationException;
-import com.auth0.Tokens;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.dev.logBook.config.AuthConfig;
+import com.dev.logBook.controller.dto.LoginDTO;
+import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.entities.User;
-import com.dev.logBook.services.UserService;
+import com.dev.logBook.services.AuthenticationService;
+import com.dev.logBook.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.validation.Valid;
 
-@Controller
+@RestController
+@RequestMapping(value = "/auth")
 public class AuthController {
-    @Autowired
-    private AuthConfig config;
 
     @Autowired
-    private AuthenticationController authenticationController;
+    private AuthenticationService authenticationService;
 
-    @Autowired
-    private UserService userService;
-
-    @GetMapping(value = "/auth/login")
-    protected void login(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String redirectUri = "http://localhost:8080/auth/callback";
-        String authorizeUrl = authenticationController.buildAuthorizeUrl(request, response, redirectUri)
-                .withScope("openid email")
-                .build();
-        response.sendRedirect(authorizeUrl);
+    public ResponseEntity<String> register(@Valid RegisterDTO register) {
+        String token = authenticationService.register(register);
+        return ResponseEntity.ok().body(token);
     }
 
-    @GetMapping(value = "/auth/callback")
-    public void callback(HttpServletRequest request, HttpServletResponse response)
-            throws IdentityVerificationException, IOException {
-        Tokens tokens = authenticationController.handle(request, response);
+    @PostMapping(value = "/login")
+    public ResponseEntity<String>  login(@Valid LoginDTO login) {
 
-        DecodedJWT jwt = JWT.decode(tokens.getIdToken());
-        TestingAuthenticationToken authToken2 =
-                new TestingAuthenticationToken(jwt.getSubject(), jwt.getToken());
-        authToken2.setAuthenticated(true);
-
-        SecurityContextHolder.getContext().setAuthentication(authToken2);
-
-        User user = new User(jwt);
-        if (userService.findByAuth0Id(user.getAuth0Id()) == null) {
-            userService.create(user);
-        }
-
-        response.sendRedirect(config.getContextPath(request) + "/home");
+        String token = authenticationService.login(login);
+        return ResponseEntity.ok().body(token);
     }
 
 }

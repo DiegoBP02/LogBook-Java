@@ -1,6 +1,6 @@
-com.auth0.domain: your-auth0-domain
-com.auth0.clientId: your-auth0-clientId
-com.auth0.clientSecret: your-auth0-clientSecret
-com.auth0.managementDomain: your-auth0-management-domain
-com.auth0.managementClientId: your-auth0-management-clientId
-com.auth0.managementClientSecret: your-auth0-management-clientSecret
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.show-sql=true
+spring.datasource.url=jdbc:postgresql://localhost:your-db-port/your-db-name
+spring.datasource.username=your-db-username
+spring.datasource.password=your-db-password

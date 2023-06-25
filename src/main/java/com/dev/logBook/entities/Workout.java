@@ -1,7 +1,6 @@
 package com.dev.logBook.entities;
 
 import com.dev.logBook.enums.Muscles;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

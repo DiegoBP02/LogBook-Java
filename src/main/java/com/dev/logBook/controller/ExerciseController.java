@@ -5,7 +5,6 @@ import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.services.ExerciseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -14,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping(value = "/exercises")
 public class ExerciseController {
 
@@ -22,7 +21,7 @@ public class ExerciseController {
     private ExerciseService exerciseService;
 
     @PostMapping
-    public ResponseEntity<Exercise> create(@Valid @RequestBody ExerciseDto exerciseDto) {
+    public ResponseEntity<Exercise> create(@Valid ExerciseDto exerciseDto) {
         Exercise exercise = exerciseService.create(exerciseDto);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()

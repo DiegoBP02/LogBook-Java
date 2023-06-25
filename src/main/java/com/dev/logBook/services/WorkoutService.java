@@ -25,9 +25,6 @@ public class WorkoutService {
     @Autowired
     private WorkoutRepository workoutRepository;
 
-    @Autowired
-    private UserService userService;
-
     public Workout create(WorkoutDto workoutDTO) {
         User user = getCurrentUser();
         Workout workout = Workout.builder()
@@ -88,7 +85,7 @@ public class WorkoutService {
         List<Exercise> exercisesOutsideRepsRange = new ArrayList<>();
         exercises.forEach(exercise -> {
             if (exercise.getReps() < workout.getLowerRepsRange() ||
-                    exercise.getReps() > workout.getUpperRepsRange()){
+                    exercise.getReps() > workout.getUpperRepsRange()) {
                 exercisesOutsideRepsRange.add(exercise);
             }
         });
@@ -96,7 +93,7 @@ public class WorkoutService {
         return exercisesOutsideRepsRange;
     }
 
-    public HashMap<String, Integer> calculateVolumeLoad(UUID workoutId){
+    public HashMap<String, Integer> calculateVolumeLoad(UUID workoutId) {
         Workout workout = findById(workoutId);
         List<Exercise> exercises = workout.getExercises();
         HashMap<String, Integer> result = new HashMap<>();
@@ -106,7 +103,7 @@ public class WorkoutService {
             int reps = exercise.getReps();
             int volume = weight * reps;
 
-            if(result.containsKey(name)){
+            if (result.containsKey(name)) {
                 int previousVolume = result.get(name);
                 volume += previousVolume;
             }
@@ -122,8 +119,7 @@ public class WorkoutService {
     }
 
     private User getCurrentUser() {
-        String rawAuth0Id = SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal().toString();
-        return userService.findByRawAuth0Id(rawAuth0Id);
+        return (User) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
     }
 }

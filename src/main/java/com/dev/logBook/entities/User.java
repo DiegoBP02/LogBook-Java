@@ -1,45 +1,82 @@
 package com.dev.logBook.entities;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.dev.logBook.entities.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @Entity(name = "users")
-public class User {
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
+public class User implements UserDetails {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
-    @Column(name = "auth0_id")
-    @JsonIgnore
-    private String auth0Id;
-    @JsonIgnore
+
+    private String username;
     private String email;
+    private String password;
+    private Role role;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workout> workouts = new ArrayList<>();
 
-    public User(DecodedJWT jwt) {
-        this.email = getUserEmailFromJwt(jwt);
-        this.auth0Id = getAuth0IdFromJwt(jwt);
+    public User(String username, String email, String password, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
-    private String getUserEmailFromJwt(DecodedJWT jwt) {
-        return jwt.getClaims().get("email").asString();
+    public UUID getId() {
+        return id;
     }
 
-    private String getAuth0IdFromJwt(DecodedJWT jwt) {
-        String subject = jwt.getSubject();
-        return subject.substring(subject.lastIndexOf("|") + 1);
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

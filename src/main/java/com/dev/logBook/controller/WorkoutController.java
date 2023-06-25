@@ -4,11 +4,9 @@ import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.services.WorkoutService;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,7 +25,7 @@ public class WorkoutController {
     private WorkoutService workoutService;
 
     @PostMapping
-    public ResponseEntity<Workout> create(@Valid @RequestBody WorkoutDto workoutDTO) {
+    public ResponseEntity<Workout> create(@Valid WorkoutDto workoutDTO) {
         Workout workout = workoutService.create(workoutDTO);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -51,8 +49,8 @@ public class WorkoutController {
 
     @GetMapping(value = "/date/{date}")
     public ResponseEntity<Workout> findByDate(@PathVariable
-                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                  LocalDate date) {
+                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                              LocalDate date) {
         Workout workout = workoutService.findByDateAndUserId(date);
         return ResponseEntity.ok().body(workout);
     }
