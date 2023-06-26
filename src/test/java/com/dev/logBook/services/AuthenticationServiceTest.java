@@ -39,7 +39,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should return an user")
-    void loadUserByUsername() {
+    void loadUserByUsername_successful() {
         when(userRepository.findByUsername(anyString()))
                 .thenReturn(USER_RECORD);
 
@@ -52,7 +52,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should throw UsernameNotFoundException if there is no user")
-    void loadUserByUsernameUsernameNotFoundException() {
+    void loadUserByUsername_userDoesNotExist() {
         String username = USER_RECORD.getUsername();
 
         when(userRepository.findByUsername(anyString()))
@@ -68,7 +68,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should return a token")
-    void register() {
+    void register_successful() {
         String token = "token";
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
@@ -82,7 +82,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should throw DuplicateKeyException if user already exists")
-    void registerDuplicateKeyException() {
+    void register_userAlreadyExists() {
         when(userRepository.save(any(User.class)))
                 .thenThrow(new DataIntegrityViolationException(anyString()));
 
@@ -96,7 +96,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should return a token")
-    void login() {
+    void login_successful() {
         String token = "token";
         Authentication authenticate = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))

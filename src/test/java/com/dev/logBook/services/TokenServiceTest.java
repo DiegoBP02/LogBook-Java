@@ -42,7 +42,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token")
-    void generateToken_NotNull() {
+    void generateToken_notNull() {
         String token = tokenService.generateToken(USER_RECORD);
 
         assertNotNull(token);
@@ -50,7 +50,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with correct issuer")
-    void generateToken_CorrectIssuer() {
+    void generateToken_correctIssuer() {
         String token = tokenService.generateToken(USER_RECORD);
 
         DecodedJWT decodedToken = JWT.decode(token);
@@ -60,7 +60,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with correct claim")
-    void generateToken_CorrectClaims() {
+    void generateToken_correctClaims() {
         String token = tokenService.generateToken(USER_RECORD);
 
         DecodedJWT decodedToken = JWT.decode(token);
@@ -71,7 +71,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with correct issued time")
-    void generateToken_CorrectIssuedAt() {
+    void generateToken_correctIssuedAt() {
         String token = tokenService.generateToken(USER_RECORD);
 
         DecodedJWT decodedToken = JWT.decode(token);
@@ -87,7 +87,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with correct expiration")
-    void generateToken_CorrectExpiration() {
+    void generateToken_correctExpiration() {
         String token = tokenService.generateToken(USER_RECORD);
 
         DecodedJWT decodedToken = JWT.decode(token);
@@ -106,7 +106,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with correct signature")
-    void generateToken_CorrectSignature() {
+    void generateToken_correctSignature() {
         String token = tokenService.generateToken(USER_RECORD);
 
         Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
@@ -116,7 +116,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should throw SignatureVerificationException if signature is incorrect")
-    void generateToken_IncorrectSignature() {
+    void generateToken_incorrectSignature() {
         String token = tokenService.generateToken(USER_RECORD);
 
         Algorithm algorithm = Algorithm.HMAC256("invalidSecret");
@@ -128,7 +128,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should generate a token with all valid values")
-    void generateToken_CorrectToken() {
+    void generateToken_correctToken() {
         String token = tokenService.generateToken(USER_RECORD);
         DecodedJWT decodedToken = JWT.decode(token);
 
