@@ -6,6 +6,9 @@ import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.enums.Role;
 import com.dev.logBook.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,19 +30,30 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Lazy
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Username not found: " + username);
+        }
+        return user;
     }
 
     public String register(RegisterDTO register) {
-        User user = new User(register.getUsername(), register.getEmail(),
-                passwordEncoder.encode(register.getPassword()), Role.ROLE_USER);
-        userRepository.save(user);
-        return tokenService.generateToken(user);
+        try {
+            User user = new User(register.getUsername(), register.getEmail(),
+                    passwordEncoder.encode(register.getPassword()), Role.ROLE_USER);
+            userRepository.save(user);
+            return tokenService.generateToken(user);
+        } catch (DataIntegrityViolationException e) {
+            String errorMessage = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
+            assert errorMessage != null;
+            throw new DuplicateKeyException(errorMessage);
+        }
     }
 
     public String login(LoginDTO login) {

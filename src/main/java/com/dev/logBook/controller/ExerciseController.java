@@ -21,7 +21,7 @@ public class ExerciseController {
     private ExerciseService exerciseService;
 
     @PostMapping
-    public ResponseEntity<Exercise> create(@Valid ExerciseDto exerciseDto) {
+    public ResponseEntity<Exercise> create(@Valid @RequestBody ExerciseDto exerciseDto) {
         Exercise exercise = exerciseService.create(exerciseDto);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -44,7 +44,8 @@ public class ExerciseController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Exercise> update(@PathVariable UUID id, @Valid @RequestBody ExerciseDto exerciseDto) {
+    public ResponseEntity<Exercise> update(@PathVariable UUID id,
+                                           @Valid @RequestBody ExerciseDto exerciseDto) {
         Exercise exercise = exerciseService.update(id, exerciseDto);
         return ResponseEntity.ok().body(exercise);
     }

@@ -2,6 +2,7 @@ package com.dev.logBook.exceptions;
 
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -17,7 +18,7 @@ import java.util.List;
 @ControllerAdvice
 public class ExceptionHandlers {
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<StandardError> exception(Exception e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> Exception(Exception e, HttpServletRequest request) {
         String error = "Server error";
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
@@ -26,7 +27,7 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> methodArgumentNotValidException
+    public ResponseEntity<StandardError> MethodArgumentNotValidException
             (MethodArgumentNotValidException e, HttpServletRequest request) {
         String error = "Invalid arguments";
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -41,7 +42,7 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<StandardError> resourceNotFoundException
+    public ResponseEntity<StandardError> ResourceNotFoundException
             (ResourceNotFoundException e, HttpServletRequest request) {
         String error = "Resource not found";
         HttpStatus status = HttpStatus.NOT_FOUND;
@@ -51,12 +52,20 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(UnauthorizedAccessException.class)
-    public ResponseEntity<StandardError> unauthorizedAccessException
+    public ResponseEntity<StandardError> UnauthorizedAccessException
             (UnauthorizedAccessException e, HttpServletRequest request) {
         String error = "Access denied";
         HttpStatus status = HttpStatus.FORBIDDEN;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<StandardError> DuplicateKeyException(DuplicateKeyException e, HttpServletRequest request) {
+        String error = "Duplicate key violates unique constraint";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 }

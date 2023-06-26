@@ -25,7 +25,7 @@ public class WorkoutController {
     private WorkoutService workoutService;
 
     @PostMapping
-    public ResponseEntity<Workout> create(@Valid WorkoutDto workoutDTO) {
+    public ResponseEntity<Workout> create(@Valid @RequestBody WorkoutDto workoutDTO) {
         Workout workout = workoutService.create(workoutDTO);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -56,7 +56,8 @@ public class WorkoutController {
     }
 
     @GetMapping(value = "/exercisesOutsideRepRange/{id}")
-    public ResponseEntity<List<Exercise>> getExercisesOutsideRepsRange(@PathVariable UUID id) {
+    public ResponseEntity<List<Exercise>> getExercisesOutsideRepsRange
+            (@PathVariable UUID id) {
         List<Exercise> exercises = workoutService.getExercisesOutsideRepsRange(id);
         return ResponseEntity.ok().body(exercises);
     }
@@ -68,7 +69,8 @@ public class WorkoutController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Workout> update(@PathVariable UUID id, @Valid @RequestBody WorkoutDto workoutDto) {
+    public ResponseEntity<Workout> update(@PathVariable UUID id,
+                                          @Valid @RequestBody WorkoutDto workoutDto) {
         Workout workout = workoutService.update(id, workoutDto);
         return ResponseEntity.ok().body(workout);
     }
