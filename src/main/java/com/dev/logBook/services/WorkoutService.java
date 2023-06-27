@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,31 +51,21 @@ public class WorkoutService {
 
     public Workout findByDateAndUserId(LocalDate date) {
         User user = getCurrentUser();
-        return workoutRepository.findByDateAndUserId(date, user.getId())
+        Workout workout = workoutRepository.findByDateAndUserId(date, user.getId())
                 .orElseThrow(ResourceNotFoundException::new);
+        checkOwnership(user, workout.getUser().getId());
+        return workout;
     }
 
     public Workout update(UUID id, WorkoutDto workoutDto) {
-        try {
-            User user = getCurrentUser();
-            Workout entity = workoutRepository.getReferenceById(id);
-            checkOwnership(user, entity.getUser().getId());
-            updateData(entity, workoutDto);
-            return workoutRepository.save(entity);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(id);
-        }
+        Workout workout = findById(id);
+        updateData(workout, workoutDto);
+        return workoutRepository.save(workout);
     }
 
     public void delete(UUID id) {
-        try {
-            User user = getCurrentUser();
-            Workout workout = workoutRepository.getReferenceById(id);
-            checkOwnership(user, workout.getUser().getId());
-            workoutRepository.deleteById(id);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(id);
-        }
+        findById(id);
+        workoutRepository.deleteById(id);
     }
 
     public List<Exercise> getExercisesOutsideRepsRange(UUID workoutId) {
