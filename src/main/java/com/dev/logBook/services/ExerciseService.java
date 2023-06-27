@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +36,7 @@ public class ExerciseService {
                 .workout(workout)
                 .user(user)
                 .build();
+
         return exerciseRepository.save(exercise);
     }
 
@@ -54,26 +54,14 @@ public class ExerciseService {
     }
 
     public Exercise update(UUID id, ExerciseDto exerciseDto) {
-        try {
-            User user = getCurrentUser();
-            Exercise entity = exerciseRepository.getReferenceById(id);
-            checkOwnership(user, entity.getUser().getId());
-            updateData(entity, exerciseDto);
-            return exerciseRepository.save(entity);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(id);
-        }
+        Exercise entity = findById(id);
+        updateData(entity, exerciseDto);
+        return exerciseRepository.save(entity);
     }
 
     public void delete(UUID id) {
-        try {
-            User user = getCurrentUser();
-            Exercise exercise = exerciseRepository.getReferenceById(id);
-            checkOwnership(user, exercise.getUser().getId());
-            exerciseRepository.deleteById(id);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(id);
-        }
+        findById(id);
+        exerciseRepository.deleteById(id);
     }
 
     private void updateData(Exercise entity, ExerciseDto obj) {
