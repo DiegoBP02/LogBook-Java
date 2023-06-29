@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -75,6 +76,27 @@ class AuthControllerTest extends ApplicationConfigTest {
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof MethodArgumentNotValidException));
+    }
+
+    @Test
+    @DisplayName("should throw DuplicateKeyException if user already exists in db")
+    void register_userAlreadyExists() throws Exception {
+        when(authenticationService.register(any(RegisterDTO.class)))
+                .thenThrow(DuplicateKeyException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .post(PATH + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(REGISTER_DTO_RECORD));
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof DuplicateKeyException));
+
+        verify(authenticationService, times(1)).register(any(RegisterDTO.class));
     }
 
     @Test

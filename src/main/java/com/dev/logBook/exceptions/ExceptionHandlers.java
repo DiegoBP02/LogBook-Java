@@ -1,5 +1,8 @@
 package com.dev.logBook.exceptions;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -62,10 +65,43 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<StandardError> DuplicateKeyException(DuplicateKeyException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> DuplicateKeyException
+            (DuplicateKeyException e, HttpServletRequest request) {
         String error = "Duplicate key violates unique constraint";
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(SignatureVerificationException.class)
+    public ResponseEntity<StandardError> SignatureVerificationException
+            (SignatureVerificationException e, HttpServletRequest request) {
+        String error = "Invalid token signature";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(JWTDecodeException.class)
+    public ResponseEntity<StandardError> JWTDecodeException
+            (JWTDecodeException e, HttpServletRequest request) {
+        String error = "Error decoding JWT token";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<StandardError> TokenExpiredException
+            (TokenExpiredException e, HttpServletRequest request) {
+        String error = "Token expired";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }
