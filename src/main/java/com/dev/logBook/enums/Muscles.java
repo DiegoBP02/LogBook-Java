@@ -8,7 +8,8 @@ public enum Muscles {
     biceps(5),
     triceps(6),
     calves(7),
-    abdominal(8);
+    abdominal(8),
+    fullBody(9);
 
     private int code;
 

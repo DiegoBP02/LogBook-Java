@@ -129,7 +129,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
 
     @Test
     @WithMockUser
-    @DisplayName("should throw DuplicateKeyException if user already exists in db")
+    @DisplayName("should throw UniqueConstraintViolationError if user already exists in db")
     void register_userAlreadyExists() throws Exception {
         when(workoutService.create(any(WorkoutDto.class)))
                 .thenThrow(UniqueConstraintViolationError.class);

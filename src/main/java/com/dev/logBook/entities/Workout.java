@@ -18,13 +18,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity(name = "workouts")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"muscle", "user_id", "date"}))
 public class Workout {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     private Muscles muscle;
-    @Column(unique = true)
     private LocalDate date;
     private int lowerRepsRange;
     private int upperRepsRange;

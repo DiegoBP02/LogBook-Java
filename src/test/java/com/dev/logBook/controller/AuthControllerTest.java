@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -80,7 +79,7 @@ class AuthControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @DisplayName("should throw DuplicateKeyException if user already exists in db")
+    @DisplayName("should throw UniqueConstraintViolationError if user already exists in db")
     void register_userAlreadyExists() throws Exception {
         when(authenticationService.register(any(RegisterDTO.class)))
                 .thenThrow(UniqueConstraintViolationError.class);
