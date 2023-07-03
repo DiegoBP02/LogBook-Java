@@ -1,9 +1,5 @@
 package com.dev.logBook.config;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.MissingClaimException;
-import com.auth0.jwt.exceptions.SignatureVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.repositories.UserRepository;
 import com.dev.logBook.services.TokenService;
@@ -21,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Instant;
 
 @Component
 public class FilterToken extends OncePerRequestFilter {
