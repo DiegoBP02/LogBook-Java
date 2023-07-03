@@ -6,6 +6,7 @@ import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.enums.Role;
 import com.dev.logBook.repositories.UserRepository;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,12 +82,13 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    @DisplayName("should throw DuplicateKeyException if user already exists")
+    @DisplayName("should throw UniqueConstraintViolationError if user already exists")
     void register_userAlreadyExists() {
         when(userRepository.save(any(User.class)))
-                .thenThrow(new DataIntegrityViolationException(anyString()));
+                .thenThrow(DataIntegrityViolationException.class);
 
-        DuplicateKeyException exception = assertThrows(DuplicateKeyException.class, () -> {
+        UniqueConstraintViolationError exception =
+                assertThrows(UniqueConstraintViolationError.class, () -> {
             authenticationService.register(REGISTER_DTO_RECORD);
         });
 

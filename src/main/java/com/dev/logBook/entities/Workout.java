@@ -1,6 +1,7 @@
 package com.dev.logBook.entities;
 
 import com.dev.logBook.enums.Muscles;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class Workout {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     private Muscles muscle;
+    @Column(unique = true)
     private LocalDate date;
     private int lowerRepsRange;
     private int upperRepsRange;
@@ -30,6 +32,7 @@ public class Workout {
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exercise> exercises;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

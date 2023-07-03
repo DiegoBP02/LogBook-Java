@@ -5,7 +5,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
-import org.springframework.dao.DuplicateKeyException;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -64,10 +64,10 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<StandardError> DuplicateKeyException
-            (DuplicateKeyException e, HttpServletRequest request) {
-        String error = "Duplicate key violates unique constraint";
+    @ExceptionHandler(UniqueConstraintViolationError.class)
+    public ResponseEntity<StandardError> UniqueConstraintViolationError
+            (UniqueConstraintViolationError e, HttpServletRequest request) {
+        String error = "Duplicate entry found. Please provide a unique value";
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());

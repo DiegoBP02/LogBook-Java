@@ -6,6 +6,7 @@ import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.enums.Role;
 import com.dev.logBook.services.AuthenticationService;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ class AuthControllerTest extends ApplicationConfigTest {
     @DisplayName("should throw DuplicateKeyException if user already exists in db")
     void register_userAlreadyExists() throws Exception {
         when(authenticationService.register(any(RegisterDTO.class)))
-                .thenThrow(DuplicateKeyException.class);
+                .thenThrow(UniqueConstraintViolationError.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
                 .post(PATH + "/register")
@@ -94,7 +95,7 @@ class AuthControllerTest extends ApplicationConfigTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
-                                instanceof DuplicateKeyException));
+                                instanceof UniqueConstraintViolationError));
 
         verify(authenticationService, times(1)).register(any(RegisterDTO.class));
     }

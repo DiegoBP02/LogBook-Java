@@ -12,11 +12,13 @@ import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.repositories.WorkoutRepository;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,6 +98,22 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
         verify(workoutRepository, times(1)).save(any(Workout.class));
     }
+
+    @Test
+    @DisplayName("should throw UniqueConstraintViolationError " +
+            "if workout with the same date already exists")
+    void crete_workoutAlreadyExists() {
+        when(workoutRepository.save(any(Workout.class)))
+                .thenThrow(DataIntegrityViolationException.class);
+
+        UniqueConstraintViolationError exception =
+                assertThrows(UniqueConstraintViolationError.class, () -> {
+                    workoutService.create(WORKOUT_DTO_RECORD);
+                });
+
+        verify(workoutRepository, times(1)).save(any(Workout.class));
+    }
+
 
     @Test
     @DisplayName("should return a list of workouts")

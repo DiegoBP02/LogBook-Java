@@ -5,10 +5,10 @@ import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.enums.Role;
 import com.dev.logBook.repositories.UserRepository;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,9 +50,7 @@ public class AuthenticationService implements UserDetailsService {
             userRepository.save(user);
             return tokenService.generateToken(user);
         } catch (DataIntegrityViolationException e) {
-            String errorMessage = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
-            assert errorMessage != null;
-            throw new DuplicateKeyException(errorMessage);
+            throw new UniqueConstraintViolationError("user", "username or email");
         }
     }
 

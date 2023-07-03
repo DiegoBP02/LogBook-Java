@@ -6,7 +6,9 @@ import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.repositories.WorkoutRepository;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +27,19 @@ public class WorkoutService {
     private WorkoutRepository workoutRepository;
 
     public Workout create(WorkoutDto workoutDTO) {
-        User user = getCurrentUser();
-        Workout workout = Workout.builder()
-                .date(workoutDTO.getDate())
-                .muscle(workoutDTO.getMuscle())
-                .user(user)
-                .lowerRepsRange(workoutDTO.getLowerRepsRange())
-                .upperRepsRange(workoutDTO.getUpperRepsRange())
-                .build();
-        return workoutRepository.save(workout);
+        try {
+            User user = getCurrentUser();
+            Workout workout = Workout.builder()
+                    .date(workoutDTO.getDate())
+                    .muscle(workoutDTO.getMuscle())
+                    .user(user)
+                    .lowerRepsRange(workoutDTO.getLowerRepsRange())
+                    .upperRepsRange(workoutDTO.getUpperRepsRange())
+                    .build();
+            return workoutRepository.save(workout);
+        } catch (DataIntegrityViolationException e) {
+            throw new UniqueConstraintViolationError("workout", "date");
+        }
     }
 
     public List<Workout> findAll() {

@@ -1,6 +1,7 @@
 package com.dev.logBook.controller;
 
 import com.dev.logBook.ApplicationConfigTest;
+import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.dtos.ExerciseDto;
 import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Exercise;
@@ -11,6 +12,7 @@ import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.services.WorkoutService;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
+import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -123,6 +125,28 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                                 instanceof MethodArgumentNotValidException));
 
         verify(workoutService, never()).create(any(WorkoutDto.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw DuplicateKeyException if user already exists in db")
+    void register_userAlreadyExists() throws Exception {
+        when(workoutService.create(any(WorkoutDto.class)))
+                .thenThrow(UniqueConstraintViolationError.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .post(PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(WORKOUT_DTO_RECORD));
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UniqueConstraintViolationError));
+
+        verify(workoutService, times(1)).create(any(WorkoutDto.class));
     }
 
     @Test
