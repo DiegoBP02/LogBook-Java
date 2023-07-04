@@ -38,7 +38,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     User USER_RECORD_2 = new User("username", "email", "password", Role.ROLE_USER);
     WorkoutDto WORKOUT_DTO_RECORD = WorkoutDto.builder()
             .date(LocalDate.now())
-            .muscle(Muscles.chest)
+            .muscle(Muscles.CHEST)
             .lowerRepsRange(8)
             .upperRepsRange(12)
             .build();
@@ -169,27 +169,29 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should return a workout")
-    void findByDateAndUserId_successful() throws Exception {
-        when(workoutRepository.findByDateAndUserId(any(LocalDate.class), any(UUID.class)))
+    void findByDateAndMuscleAndUserId_successful() throws Exception {
+        when(workoutRepository.findByDateAndMuscleAndUserId
+                (any(LocalDate.class), any(Muscles.class),any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
-        Workout result = workoutService.findByDateAndUserId(WORKOUT_RECORD.getDate());
+        Workout result = workoutService.findByDateAndMuscle
+                (WORKOUT_RECORD.getDate(), WORKOUT_RECORD.getMuscle());
 
         assertEquals(WORKOUT_RECORD, result);
 
         verify(workoutRepository, times(1))
-                .findByDateAndUserId(any(LocalDate.class), any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
     }
 
     @Test
     @DisplayName("should throw ResourceNotFoundException if no workout is found")
     void findByDateAndUserId_noWorkoutFound() throws Exception {
         assertThrows(ResourceNotFoundException.class, () -> {
-            workoutService.findByDateAndUserId(WORKOUT_RECORD.getDate());
+            workoutService.findByDateAndMuscle(WORKOUT_RECORD.getDate(), WORKOUT_RECORD.getMuscle());
         });
 
         verify(workoutRepository, times(1))
-                .findByDateAndUserId(any(LocalDate.class), any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
     }
 
     @Test
@@ -197,15 +199,16 @@ class WorkoutServiceTest extends ApplicationConfigTest {
             "if user is not the owner of the workout")
     void findByDateAndUserId_invalidCheckOwnership() throws Exception {
         when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
-        when(workoutRepository.findByDateAndUserId(any(LocalDate.class), any(UUID.class)))
+        when(workoutRepository.findByDateAndMuscleAndUserId
+                (any(LocalDate.class), any(Muscles.class),any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
         assertThrows(UnauthorizedAccessException.class, () -> {
-            workoutService.findByDateAndUserId(WORKOUT_RECORD.getDate());
+            workoutService.findByDateAndMuscle(WORKOUT_RECORD.getDate(), WORKOUT_RECORD.getMuscle());
         });
 
         verify(workoutRepository, times(1))
-                .findByDateAndUserId(any(LocalDate.class), any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
     }
 
     @Test
@@ -215,7 +218,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
                 .thenReturn(Optional.of(WORKOUT_RECORD));
         when(workoutRepository.save(any(Workout.class))).thenReturn(WORKOUT_RECORD);
 
-        WORKOUT_DTO_RECORD.setMuscle(Muscles.back);
+        WORKOUT_DTO_RECORD.setMuscle(Muscles.BACK);
 
         Workout result = workoutService.update(UUID.randomUUID(), WORKOUT_DTO_RECORD);
 

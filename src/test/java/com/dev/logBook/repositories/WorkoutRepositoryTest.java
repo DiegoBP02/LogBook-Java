@@ -15,8 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class WorkoutRepositoryTest {
@@ -28,7 +27,7 @@ class WorkoutRepositoryTest {
     private UserRepository userRepository;
 
     @AfterEach
-    void tearDown() throws Exception{
+    void tearDown() throws Exception {
         subject.deleteAll();
     }
 
@@ -41,7 +40,7 @@ class WorkoutRepositoryTest {
 
         Workout WORKOUT_RECORD = Workout.builder()
                 .date(LocalDate.now())
-                .muscle(Muscles.chest)
+                .muscle(Muscles.CHEST)
                 .user(USER_RECORD)
                 .lowerRepsRange(8)
                 .upperRepsRange(12)
@@ -55,15 +54,15 @@ class WorkoutRepositoryTest {
     }
 
     @Test
-    @DisplayName("should find a workout by the date and user id")
-    void findByDateAndUserId() throws Exception {
+    @DisplayName("should find a workout by the date, muscle and user id")
+    void findByDateAndMuscleAndUserId() throws Exception {
         User USER_RECORD = new User("username", "email",
                 "password", Role.ROLE_USER);
         userRepository.save(USER_RECORD);
 
         Workout WORKOUT_RECORD = Workout.builder()
                 .date(LocalDate.now())
-                .muscle(Muscles.chest)
+                .muscle(Muscles.CHEST)
                 .user(USER_RECORD)
                 .lowerRepsRange(8)
                 .upperRepsRange(12)
@@ -71,8 +70,8 @@ class WorkoutRepositoryTest {
 
         subject.save(WORKOUT_RECORD);
 
-        Optional<Workout> result = subject.findByDateAndUserId
-                (WORKOUT_RECORD.getDate(),USER_RECORD.getId());
+        Optional<Workout> result = subject.findByDateAndMuscleAndUserId
+                (WORKOUT_RECORD.getDate(), WORKOUT_RECORD.getMuscle(), USER_RECORD.getId());
 
         assertEquals(Optional.of(WORKOUT_RECORD), result);
     }

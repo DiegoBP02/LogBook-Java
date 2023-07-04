@@ -43,7 +43,7 @@ class ExerciseRepositoryTest {
 
         Workout WORKOUT_RECORD = Workout.builder()
                 .date(LocalDate.now())
-                .muscle(Muscles.chest)
+                .muscle(Muscles.CHEST)
                 .user(USER_RECORD)
                 .lowerRepsRange(8)
                 .upperRepsRange(12)

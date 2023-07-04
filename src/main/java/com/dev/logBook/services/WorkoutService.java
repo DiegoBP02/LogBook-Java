@@ -4,6 +4,7 @@ import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.User;
 import com.dev.logBook.entities.Workout;
+import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.repositories.WorkoutRepository;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
@@ -55,9 +56,9 @@ public class WorkoutService {
         return workout;
     }
 
-    public Workout findByDateAndUserId(LocalDate date) {
+    public Workout findByDateAndMuscle(LocalDate date, Muscles muscle) {
         User user = getCurrentUser();
-        Workout workout = workoutRepository.findByDateAndUserId(date, user.getId())
+        Workout workout = workoutRepository.findByDateAndMuscleAndUserId(date, muscle, user.getId())
                 .orElseThrow(ResourceNotFoundException::new);
         checkOwnership(user, workout.getUser().getId());
         return workout;

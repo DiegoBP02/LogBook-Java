@@ -1,15 +1,15 @@
 package com.dev.logBook.enums;
 
 public enum Muscles {
-    chest(1),
-    back(2),
-    shoulders(3),
-    legs(4),
-    biceps(5),
-    triceps(6),
-    calves(7),
-    abdominal(8),
-    fullBody(9);
+    CHEST(1),
+    BACK(2),
+    SHOULDERS(3),
+    LEGS(4),
+    BICEPS(5),
+    TRICEPS(6),
+    CALVES(7),
+    ABDOMINAL(8),
+    FULL_BODY(9);
 
     private int code;
 

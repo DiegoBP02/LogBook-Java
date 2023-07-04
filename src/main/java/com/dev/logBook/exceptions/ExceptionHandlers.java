@@ -3,9 +3,12 @@ package com.dev.logBook.exceptions;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.dev.logBook.controller.exceptions.InvalidMuscleEnumException;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -104,4 +107,23 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(InvalidMuscleEnumException.class)
+    public ResponseEntity<StandardError> InvalidMuscleEnumException
+            (InvalidMuscleEnumException e, HttpServletRequest request) {
+        String error = "Invalid input. Please provide valid data";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<StandardError> InvalidFormatException
+            (InvalidFormatException e, HttpServletRequest request) {
+        String error = "Invalid input. Please provide valid data";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }

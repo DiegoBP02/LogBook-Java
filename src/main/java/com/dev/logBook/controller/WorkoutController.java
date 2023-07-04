@@ -1,8 +1,10 @@
 package com.dev.logBook.controller;
 
+import com.dev.logBook.controller.exceptions.InvalidMuscleEnumException;
 import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.Workout;
+import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.services.WorkoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,12 +49,19 @@ public class WorkoutController {
         return ResponseEntity.ok().body(workout);
     }
 
-    @GetMapping(value = "/date/{date}")
-    public ResponseEntity<Workout> findByDate(@PathVariable
-                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                              LocalDate date) {
-        Workout workout = workoutService.findByDateAndUserId(date);
-        return ResponseEntity.ok().body(workout);
+    @GetMapping(value = "/date/{date}/{muscle}")
+    public ResponseEntity<Workout> findByDateAndMuscle
+            (@PathVariable
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+             LocalDate date,
+             @PathVariable String muscle) {
+        try {
+            Muscles isValidMuscle = Muscles.valueOf(muscle.toUpperCase());
+            Workout workout = workoutService.findByDateAndMuscle(date, isValidMuscle);
+            return ResponseEntity.ok().body(workout);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidMuscleEnumException(muscle);
+        }
     }
 
     @GetMapping(value = "/exercisesOutsideRepRange/{id}")

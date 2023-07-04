@@ -2,6 +2,7 @@ package com.dev.logBook.controller;
 
 import com.dev.logBook.ApplicationConfigTest;
 import com.dev.logBook.controller.dto.RegisterDTO;
+import com.dev.logBook.controller.exceptions.InvalidMuscleEnumException;
 import com.dev.logBook.dtos.ExerciseDto;
 import com.dev.logBook.dtos.WorkoutDto;
 import com.dev.logBook.entities.Exercise;
@@ -48,7 +49,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     User USER_RECORD = new User("username", "email", "password", Role.ROLE_USER);
     WorkoutDto WORKOUT_DTO_RECORD = WorkoutDto.builder()
             .date(LocalDate.now())
-            .muscle(Muscles.chest)
+            .muscle(Muscles.CHEST)
             .lowerRepsRange(8)
             .upperRepsRange(12)
             .build();
@@ -275,30 +276,33 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser
     @DisplayName("should return a workout")
-    void findByDate_success() throws Exception {
-        when(workoutService.findByDateAndUserId(any(LocalDate.class)))
+    void findByDateAndMuscle_success() throws Exception {
+        when(workoutService.findByDateAndMuscle(any(LocalDate.class), any(Muscles.class)))
                 .thenReturn(WORKOUT_RECORD);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .get(PATH + "/date/" + WORKOUT_RECORD.getDate())
+                .get(PATH + "/date/" + WORKOUT_RECORD.getDate()
+                        + "/" + WORKOUT_RECORD.getMuscle())
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(WORKOUT_RECORD)));
 
-        verify(workoutService, times(1)).findByDateAndUserId(any(LocalDate.class));
+        verify(workoutService, times(1))
+                .findByDateAndMuscle(any(LocalDate.class), any(Muscles.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("should throw ResourceNotFoundException if no workout is found")
-    void findByDate_noExerciseFound() throws Exception {
-        when(workoutService.findByDateAndUserId(any(LocalDate.class)))
+    void findByDateAndMuscle_noExerciseFound() throws Exception {
+        when(workoutService.findByDateAndMuscle(any(LocalDate.class), any(Muscles.class)))
                 .thenThrow(ResourceNotFoundException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .get(PATH + "/date/" + WORKOUT_RECORD.getDate())
+                .get(PATH + "/date/" + WORKOUT_RECORD.getDate()
+                        + "/" + WORKOUT_RECORD.getMuscle())
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(mockRequest)
@@ -307,19 +311,21 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                         assertTrue(result.getResolvedException()
                                 instanceof ResourceNotFoundException));
 
-        verify(workoutService, times(1)).findByDateAndUserId(any(LocalDate.class));
+        verify(workoutService, times(1))
+                .findByDateAndMuscle(any(LocalDate.class), any(Muscles.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("should throw UnauthorizedAccessException " +
             "if user is not the owner of the workout")
-    void findByDate_invalidCheckOwnership() throws Exception {
-        when(workoutService.findByDateAndUserId(any(LocalDate.class)))
+    void findByDateAndMuscle_invalidCheckOwnership() throws Exception {
+        when(workoutService.findByDateAndMuscle(any(LocalDate.class), any(Muscles.class)))
                 .thenThrow(UnauthorizedAccessException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .get(PATH + "/date/" + WORKOUT_RECORD.getDate())
+                .get(PATH + "/date/" + WORKOUT_RECORD.getDate()
+                        + "/" + WORKOUT_RECORD.getMuscle())
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(mockRequest)
@@ -328,14 +334,36 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                         assertTrue(result.getResolvedException()
                                 instanceof UnauthorizedAccessException));
 
-        verify(workoutService, times(1)).findByDateAndUserId(any(LocalDate.class));
+        verify(workoutService, times(1))
+                .findByDateAndMuscle(any(LocalDate.class), any(Muscles.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw InvalidMuscleEnumException " +
+            "if muscle is not a valid enum from Muscles enum")
+    void findByDateAndMuscle_invalidMuscleEnum() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/date/" + WORKOUT_RECORD.getDate()
+                        + "/" + "invalidMuscle")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof InvalidMuscleEnumException));
+
+        verify(workoutService, never())
+                .findByDateAndMuscle(any(LocalDate.class), any(Muscles.class));
     }
 
     @Test
     @DisplayName("should return 403 - Forbidden if user is not authenticated")
-    void findByDate_invalidUser() throws Exception {
+    void findByDateAndMuscle_invalidUser() throws Exception {
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .get(PATH + "/date/" + WORKOUT_RECORD.getDate())
+                .get(PATH + "/date/" + WORKOUT_RECORD.getDate()
+                        + "/" + WORKOUT_RECORD.getMuscle())
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(mockRequest)
@@ -343,7 +371,8 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                 .andExpect(result -> assertEquals
                         ("Access Denied", result.getResponse().getErrorMessage()));
 
-        verify(workoutService, never()).findByDateAndUserId(any(LocalDate.class));
+        verify(workoutService, never())
+                .findByDateAndMuscle(any(LocalDate.class), any(Muscles.class));
     }
 
     @Test
