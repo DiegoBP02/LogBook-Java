@@ -13,6 +13,8 @@ import com.dev.logBook.repositories.WorkoutRepository;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
+import com.dev.logBook.services.utils.ExerciseComparator;
+import com.dev.logBook.services.utils.ExerciseComparator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -171,7 +173,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @DisplayName("should return a workout")
     void findByDateAndMuscleAndUserId_successful() throws Exception {
         when(workoutRepository.findByDateAndMuscleAndUserId
-                (any(LocalDate.class), any(Muscles.class),any(UUID.class)))
+                (any(LocalDate.class), any(Muscles.class), any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
         Workout result = workoutService.findByDateAndMuscle
@@ -180,7 +182,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         assertEquals(WORKOUT_RECORD, result);
 
         verify(workoutRepository, times(1))
-                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class), any(UUID.class));
     }
 
     @Test
@@ -191,7 +193,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         });
 
         verify(workoutRepository, times(1))
-                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class), any(UUID.class));
     }
 
     @Test
@@ -200,7 +202,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     void findByDateAndUserId_invalidCheckOwnership() throws Exception {
         when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
         when(workoutRepository.findByDateAndMuscleAndUserId
-                (any(LocalDate.class), any(Muscles.class),any(UUID.class)))
+                (any(LocalDate.class), any(Muscles.class), any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
         assertThrows(UnauthorizedAccessException.class, () -> {
@@ -208,7 +210,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         });
 
         verify(workoutRepository, times(1))
-                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class),any(UUID.class));
+                .findByDateAndMuscleAndUserId(any(LocalDate.class), any(Muscles.class), any(UUID.class));
     }
 
     @Test
@@ -411,6 +413,130 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         });
 
         verify(workoutRepository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should return a list of ExerciseComparator")
+    void compareWorkouts_successful() throws Exception {
+        UUID oldWorkoutId = UUID.randomUUID();
+        UUID currentWorkoutId = UUID.randomUUID();
+
+        Exercise EXERCISE_RECORD_2 = Exercise.builder()
+                .name("random name")
+                .weight(EXERCISE_DTO_RECORD.getWeight())
+                .reps(EXERCISE_DTO_RECORD.getReps())
+                .rir(EXERCISE_DTO_RECORD.getRir())
+                .workout(WORKOUT_RECORD)
+                .user(USER_RECORD)
+                .build();
+        Exercise EXERCISE_RECORD_3 = Exercise.builder()
+                .name(EXERCISE_DTO_RECORD.getName())
+                .weight(EXERCISE_DTO_RECORD.getWeight() + 1)
+                .reps(EXERCISE_DTO_RECORD.getReps() + 2)
+                .rir(EXERCISE_DTO_RECORD.getRir() + 3)
+                .workout(WORKOUT_RECORD)
+                .user(USER_RECORD)
+                .build();
+
+        List<Exercise> oldWorkoutExercises = new ArrayList<>();
+        oldWorkoutExercises.add(EXERCISE_RECORD);
+        oldWorkoutExercises.add(EXERCISE_RECORD_2);
+
+        List<Exercise> currentWorkoutExercises = Collections.singletonList(EXERCISE_RECORD_3);
+
+        ExerciseComparator exerciseComparator = ExerciseComparator.builder()
+                .name(EXERCISE_RECORD_3.getName())
+                .repsDifference(EXERCISE_RECORD_3.getReps() - EXERCISE_RECORD.getReps())
+                .weightDifference(EXERCISE_RECORD_3.getWeight() - EXERCISE_RECORD.getWeight())
+                .rirDifference(EXERCISE_RECORD_3.getRir() - EXERCISE_RECORD.getRir())
+                .build();
+
+        List<ExerciseComparator> expectedResult = Collections.singletonList(exerciseComparator);
+
+        WORKOUT_RECORD.setExercises(oldWorkoutExercises);
+        Workout WORKOUT_RECORD_2 = new Workout();
+        WORKOUT_RECORD_2.setUser(USER_RECORD);
+        WORKOUT_RECORD_2.setExercises(currentWorkoutExercises);
+
+        when(workoutRepository.findById(oldWorkoutId))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        when(workoutRepository.findById(currentWorkoutId))
+                .thenReturn(Optional.of(WORKOUT_RECORD_2));
+
+        List<ExerciseComparator> result = workoutService.compareWorkouts(oldWorkoutId, currentWorkoutId);
+
+        assertEquals(expectedResult, result);
+
+        verify(workoutRepository, times(2))
+                .findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw ResourceNotFoundException if no workout is found" +
+            "for oldWorkoutExercises")
+    void compareWorkouts_noWorkoutFoundOldWorkoutExercises() throws Exception {
+        when(workoutRepository.findById(UUID.randomUUID()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            workoutService.compareWorkouts(UUID.randomUUID(), UUID.randomUUID());
+        });
+
+        verify(workoutRepository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw ResourceNotFoundException if no workout is found" +
+            "for currentWorkoutExercises")
+    void compareWorkouts_noWorkoutFoundCurrentWorkoutExercises() throws Exception {
+        UUID oldWorkoutId = UUID.randomUUID();
+        UUID currentWorkoutId = UUID.randomUUID();
+
+        when(workoutRepository.findById(oldWorkoutId))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        when(workoutRepository.findById(currentWorkoutId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            workoutService.compareWorkouts(oldWorkoutId, currentWorkoutId);
+        });
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the current workout")
+    void calculateVolumeLoad_invalidCurrentWorkoutExercisesCheckOwnership() throws Exception {
+        when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
+        when(workoutRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        assertThrows(UnauthorizedAccessException.class, () -> {
+            workoutService.compareWorkouts(UUID.randomUUID(), UUID.randomUUID());
+        });
+
+        verify(workoutRepository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the old workout")
+    void calculateVolumeLoad_invalidOldWorkoutExercisesCheckOwnership() throws Exception {
+        when(authentication.getPrincipal())
+                .thenReturn(USER_RECORD)
+                .thenReturn(USER_RECORD_2);
+
+        when(workoutRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        assertThrows(UnauthorizedAccessException.class, () -> {
+            workoutService.compareWorkouts(UUID.randomUUID(), UUID.randomUUID());
+        });
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
     }
 
 }

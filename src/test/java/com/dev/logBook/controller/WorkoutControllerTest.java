@@ -14,6 +14,7 @@ import com.dev.logBook.services.WorkoutService;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
+import com.dev.logBook.services.utils.ExerciseComparator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +30,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -529,6 +527,90 @@ class WorkoutControllerTest extends ApplicationConfigTest {
 
         verify(workoutService, never()).calculateVolumeLoad(any(UUID.class));
     }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should return a list of exercises")
+    void getWorkoutsComparison_success() throws Exception {
+        List<ExerciseComparator> expectedResult = new ArrayList<>();
+        when(workoutService.compareWorkouts(any(UUID.class), any(UUID.class)))
+                .thenReturn(expectedResult);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/compareWorkouts/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
+
+        verify(workoutService, times(1))
+                .compareWorkouts(any(UUID.class),any(UUID.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw ResourceNotFoundException if no workout is found")
+    void getWorkoutsComparison_noExerciseFound() throws Exception {
+        when(workoutService.compareWorkouts(any(UUID.class), any(UUID.class)))
+                .thenThrow(ResourceNotFoundException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/compareWorkouts/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResourceNotFoundException));
+
+        verify(workoutService, times(1))
+                .compareWorkouts(any(UUID.class), any(UUID.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the workout")
+    void getWorkoutsComparison_invalidCheckOwnership() throws Exception {
+        when(workoutService.compareWorkouts(any(UUID.class), any(UUID.class)))
+                .thenThrow(UnauthorizedAccessException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/compareWorkouts/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UnauthorizedAccessException));
+
+        verify(workoutService, times(1))
+                .compareWorkouts(any(UUID.class), any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should return 403 - Forbidden if user is not authenticated")
+    void getWorkoutsComparison_invalidUser() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/compareWorkouts/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertEquals
+                        ("Access Denied", result.getResponse().getErrorMessage()));
+
+        verify(workoutService, never()).compareWorkouts(any(UUID.class), any(UUID.class));
+    }
+
+
 
     @Test
     @WithMockUser

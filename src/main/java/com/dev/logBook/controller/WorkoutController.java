@@ -6,6 +6,7 @@ import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.entities.Workout;
 import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.services.WorkoutService;
+import com.dev.logBook.services.utils.ExerciseComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +75,15 @@ public class WorkoutController {
     @GetMapping(value = "/volumeLoad/{id}")
     public ResponseEntity<HashMap<String, Integer>> getVolumeLoad(@PathVariable UUID id) {
         HashMap<String, Integer> result = workoutService.calculateVolumeLoad(id);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping(value = "/compareWorkouts/{oldWorkoutId}/{currentWorkoutId}")
+    public ResponseEntity<List<ExerciseComparator>> getWorkoutsComparison
+            (@PathVariable UUID oldWorkoutId,
+             @PathVariable UUID currentWorkoutId) {
+        List<ExerciseComparator> result =
+                workoutService.compareWorkouts(oldWorkoutId, currentWorkoutId);
         return ResponseEntity.ok().body(result);
     }
 

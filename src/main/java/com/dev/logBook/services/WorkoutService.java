@@ -8,6 +8,7 @@ import com.dev.logBook.enums.Muscles;
 import com.dev.logBook.repositories.WorkoutRepository;
 import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
+import com.dev.logBook.services.utils.ExerciseComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,6 +71,11 @@ public class WorkoutService {
         return workoutRepository.save(workout);
     }
 
+    private void updateData(Workout entity, WorkoutDto obj) {
+        entity.setDate(obj.getDate());
+        entity.setMuscle(obj.getMuscle());
+    }
+
     public void delete(UUID id) {
         findById(id);
         workoutRepository.deleteById(id);
@@ -109,13 +115,45 @@ public class WorkoutService {
         return result;
     }
 
-    private void updateData(Workout entity, WorkoutDto obj) {
-        entity.setDate(obj.getDate());
-        entity.setMuscle(obj.getMuscle());
+    public List<ExerciseComparator> compareWorkouts(UUID oldWorkoutId, UUID currentWorkoutId) {
+        List<Exercise> oldWorkoutExercises = findById(oldWorkoutId).getExercises();
+        List<Exercise> currentWorkoutExercises = findById(currentWorkoutId).getExercises();
+
+        List<ExerciseComparator> result = new ArrayList<>();
+
+        for (Exercise oldExercise : oldWorkoutExercises) {
+            for (Exercise currentExercise : currentWorkoutExercises) {
+                if (oldExercise.getName().equalsIgnoreCase(currentExercise.getName())) {
+                    ExerciseComparator exerciseComparator = new ExerciseComparator();
+                    exerciseComparator.setName(currentExercise.getName());
+
+                    if (currentExercise.getReps() != oldExercise.getReps()) {
+                        int repsDifference = currentExercise.getReps() - oldExercise.getReps();
+                        exerciseComparator.setRepsDifference(repsDifference);
+                    }
+
+                    if (currentExercise.getWeight() != oldExercise.getWeight()) {
+                        int weightDifference = currentExercise.getWeight() - oldExercise.getWeight();
+                        exerciseComparator.setWeightDifference(weightDifference);
+                    }
+
+                    if (currentExercise.getRir() != oldExercise.getRir()) {
+                        int rirDifference = currentExercise.getRir() - oldExercise.getRir();
+                        exerciseComparator.setRirDifference(rirDifference);
+                    }
+
+                    result.add(exerciseComparator);
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     private User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
     }
+
 }

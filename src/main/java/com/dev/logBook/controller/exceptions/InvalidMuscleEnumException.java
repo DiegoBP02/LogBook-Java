@@ -2,8 +2,8 @@ package com.dev.logBook.controller.exceptions;
 
 import com.dev.logBook.enums.Muscles;
 
-public class InvalidMuscleEnumException extends RuntimeException{
-    public InvalidMuscleEnumException(String invalidMuscle){
+public class InvalidMuscleEnumException extends RuntimeException {
+    public InvalidMuscleEnumException(String invalidMuscle) {
         super("Invalid muscle: " + invalidMuscle + ". Muscles available: " + getAllMuscles());
     }
 
