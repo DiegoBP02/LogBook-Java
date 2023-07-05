@@ -104,7 +104,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw UniqueConstraintViolationError " +
             "if workout with the same date already exists")
-    void crete_workoutAlreadyExists() {
+    void create_workoutAlreadyExists() {
         when(workoutRepository.save(any(Workout.class)))
                 .thenThrow(DataIntegrityViolationException.class);
 
@@ -509,7 +509,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw UnauthorizedAccessException " +
             "if user is not the owner of the current workout")
-    void calculateVolumeLoad_invalidCurrentWorkoutExercisesCheckOwnership() throws Exception {
+    void compareWorkouts_invalidCurrentWorkoutExercisesCheckOwnership() throws Exception {
         when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
         when(workoutRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
@@ -524,7 +524,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw UnauthorizedAccessException " +
             "if user is not the owner of the old workout")
-    void calculateVolumeLoad_invalidOldWorkoutExercisesCheckOwnership() throws Exception {
+    void compareWorkouts_invalidOldWorkoutExercisesCheckOwnership() throws Exception {
         when(authentication.getPrincipal())
                 .thenReturn(USER_RECORD)
                 .thenReturn(USER_RECORD_2);

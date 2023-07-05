@@ -530,7 +530,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
 
     @Test
     @WithMockUser
-    @DisplayName("should return a list of exercises")
+    @DisplayName("should return a list of ExerciseComparator")
     void getWorkoutsComparison_success() throws Exception {
         List<ExerciseComparator> expectedResult = new ArrayList<>();
         when(workoutService.compareWorkouts(any(UUID.class), any(UUID.class)))
