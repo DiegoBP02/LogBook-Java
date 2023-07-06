@@ -88,8 +88,8 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
         UniqueConstraintViolationError exception =
                 assertThrows(UniqueConstraintViolationError.class, () -> {
-            authenticationService.register(REGISTER_DTO_RECORD);
-        });
+                    authenticationService.register(REGISTER_DTO_RECORD);
+                });
 
         verify(userRepository, times(1)).save(any(User.class));
         verify(tokenService, never()).generateToken(any(User.class));

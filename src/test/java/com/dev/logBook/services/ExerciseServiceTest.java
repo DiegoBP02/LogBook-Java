@@ -33,13 +33,6 @@ import static org.mockito.Mockito.*;
 
 class ExerciseServiceTest extends ApplicationConfigTest {
 
-    @Autowired
-    private ExerciseService exerciseService;
-    @MockBean
-    private ExerciseRepository exerciseRepository;
-    @MockBean
-    private WorkoutService workoutService;
-
     User USER_RECORD = new User("username", "email", "password", Role.ROLE_USER);
     User USER_RECORD_2 = new User("username", "email", "password", Role.ROLE_USER);
     Workout WORKOUT_RECORD = Workout.builder()
@@ -64,9 +57,14 @@ class ExerciseServiceTest extends ApplicationConfigTest {
             .workout(WORKOUT_RECORD)
             .user(USER_RECORD)
             .build();
-
     Authentication authentication;
     SecurityContext securityContext;
+    @Autowired
+    private ExerciseService exerciseService;
+    @MockBean
+    private ExerciseRepository exerciseRepository;
+    @MockBean
+    private WorkoutService workoutService;
 
     @BeforeEach
     void setup() {

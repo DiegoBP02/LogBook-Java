@@ -87,6 +87,25 @@ public class WorkoutController {
         return ResponseEntity.ok().body(result);
     }
 
+    @GetMapping(value = "/uniqueOldExercises/{oldWorkoutId}/{currentWorkoutId}")
+    public ResponseEntity<List<Exercise>> getUniqueOldWorkoutExercises
+            (@PathVariable UUID oldWorkoutId,
+             @PathVariable UUID currentWorkoutId) {
+        List<Exercise> result =
+                workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping(value = "/uniqueCurrentExercises/{oldWorkoutId}/{currentWorkoutId}")
+    public ResponseEntity<List<Exercise>> getUniqueCurrentWorkoutExercises
+            (@PathVariable UUID oldWorkoutId,
+             @PathVariable UUID currentWorkoutId) {
+        List<Exercise> result =
+                workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, false);
+        return ResponseEntity.ok().body(result);
+    }
+
+
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Workout> update(@PathVariable UUID id,
                                           @Valid @RequestBody WorkoutDto workoutDto) {

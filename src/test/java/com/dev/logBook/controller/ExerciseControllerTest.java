@@ -63,7 +63,6 @@ class ExerciseControllerTest extends ApplicationConfigTest {
             .workout(WORKOUT_RECORD)
             .user(USER_RECORD)
             .build();
-
     @MockBean
     private ExerciseService exerciseService;
     @Autowired

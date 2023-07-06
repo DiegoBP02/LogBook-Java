@@ -1,7 +1,6 @@
 package com.dev.logBook.controller;
 
 import com.dev.logBook.ApplicationConfigTest;
-import com.dev.logBook.controller.dto.RegisterDTO;
 import com.dev.logBook.controller.exceptions.InvalidMuscleEnumException;
 import com.dev.logBook.dtos.ExerciseDto;
 import com.dev.logBook.dtos.WorkoutDto;
@@ -72,7 +71,6 @@ class WorkoutControllerTest extends ApplicationConfigTest {
             .workout(WORKOUT_RECORD)
             .user(USER_RECORD)
             .build();
-
     @MockBean
     private WorkoutService workoutService;
     @Autowired
@@ -546,7 +544,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
 
         verify(workoutService, times(1))
-                .compareWorkouts(any(UUID.class),any(UUID.class));
+                .compareWorkouts(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -610,7 +608,177 @@ class WorkoutControllerTest extends ApplicationConfigTest {
         verify(workoutService, never()).compareWorkouts(any(UUID.class), any(UUID.class));
     }
 
+    @Test
+    @WithMockUser
+    @DisplayName("should return a list of exercises")
+    void getUniqueOldWorkoutExercises_success() throws Exception {
+        List<Exercise> expectedResult = new ArrayList<>();
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(true)))
+                .thenReturn(expectedResult);
 
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueOldExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw ResourceNotFoundException if no workout is found")
+    void getUniqueOldWorkoutExercises_noExerciseFound() throws Exception {
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(true)))
+                .thenThrow(ResourceNotFoundException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueOldExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResourceNotFoundException));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the workout")
+    void getUniqueOldWorkoutExercises_invalidCheckOwnership() throws Exception {
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(true)))
+                .thenThrow(UnauthorizedAccessException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueOldExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UnauthorizedAccessException));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+    }
+
+    @Test
+    @DisplayName("should return 403 - Forbidden if user is not authenticated")
+    void getUniqueOldWorkoutExercises_invalidUser() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueOldExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertEquals
+                        ("Access Denied", result.getResponse().getErrorMessage()));
+
+        verify(workoutService, never())
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should return a list of exercises")
+    void getUniqueCurrentWorkoutExercises_success() throws Exception {
+        List<Exercise> expectedResult = new ArrayList<>();
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(false)))
+                .thenReturn(expectedResult);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueCurrentExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw ResourceNotFoundException if no workout is found")
+    void getUniqueCurrentWorkoutExercises_noExerciseFound() throws Exception {
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(false)))
+                .thenThrow(ResourceNotFoundException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueCurrentExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResourceNotFoundException));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the workout")
+    void getUniqueCurrentWorkoutExercises_invalidCheckOwnership() throws Exception {
+        when(workoutService.getUniqueWorkoutExercises
+                (any(UUID.class), any(UUID.class), eq(false)))
+                .thenThrow(UnauthorizedAccessException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueCurrentExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UnauthorizedAccessException));
+
+        verify(workoutService, times(1))
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+    }
+
+    @Test
+    @DisplayName("should return 403 - Forbidden if user is not authenticated")
+    void getUniqueCurrentWorkoutExercises_invalidUser() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/uniqueCurrentExercises/" + UUID.randomUUID()
+                        + "/" + UUID.randomUUID())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertEquals
+                        ("Access Denied", result.getResponse().getErrorMessage()));
+
+        verify(workoutService, never())
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+    }
 
     @Test
     @WithMockUser

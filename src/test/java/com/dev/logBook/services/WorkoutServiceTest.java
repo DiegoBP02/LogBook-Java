@@ -14,7 +14,6 @@ import com.dev.logBook.services.exceptions.ResourceNotFoundException;
 import com.dev.logBook.services.exceptions.UnauthorizedAccessException;
 import com.dev.logBook.services.exceptions.UniqueConstraintViolationError;
 import com.dev.logBook.services.utils.ExerciseComparator;
-import com.dev.logBook.services.utils.ExerciseComparator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -539,5 +538,126 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         verify(workoutRepository, times(2)).findById(any(UUID.class));
     }
 
+    @Test
+    @DisplayName("should return a list with the unique exercises of the current workout")
+    void getUniqueWorkoutExercises_successfulCurrentWorkout() throws Exception {
+        UUID oldWorkoutId = UUID.randomUUID();
+        UUID currentWorkoutId = UUID.randomUUID();
+        WORKOUT_RECORD.setExercises(Collections.singletonList(EXERCISE_RECORD));
+
+        Exercise EXERCISE_RECORD_2 = Exercise.builder()
+                .name("random")
+                .build();
+        List<Exercise> exercises = Arrays.asList(EXERCISE_RECORD, EXERCISE_RECORD_2);
+        Workout WORKOUT_RECORD_2 = Workout.builder()
+                .user(USER_RECORD)
+                .exercises(exercises)
+                .build();
+
+        when(workoutRepository.findById(oldWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD));
+        when(workoutRepository.findById(currentWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD_2));
+
+        List<Exercise> expectedResult = Collections.singletonList(EXERCISE_RECORD_2);
+
+        List<Exercise> result = workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, false);
+
+        assertEquals(expectedResult, result);
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw return a list with the unique exercises of the old workout")
+    void getUniqueWorkoutExercises_successfulOldWorkout() throws Exception {
+        UUID oldWorkoutId = UUID.randomUUID();
+        UUID currentWorkoutId = UUID.randomUUID();
+        WORKOUT_RECORD.setExercises(Collections.singletonList(EXERCISE_RECORD));
+
+        Exercise EXERCISE_RECORD_2 = Exercise.builder()
+                .name("random")
+                .build();
+        Workout WORKOUT_RECORD_2 = Workout.builder()
+                .user(USER_RECORD)
+                .exercises(Collections.singletonList(EXERCISE_RECORD_2))
+                .build();
+
+        when(workoutRepository.findById(oldWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD));
+        when(workoutRepository.findById(currentWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD_2));
+
+        List<Exercise> expectedResult = Collections.singletonList(EXERCISE_RECORD);
+
+        List<Exercise> result = workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+
+        assertEquals(expectedResult, result);
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw ResourceNotFoundException if no workout is found" +
+            "for oldWorkoutExercises")
+    void getUniqueWorkoutExercises_noWorkoutFoundOldWorkoutExercises() throws Exception {
+        when(workoutRepository.findById(UUID.randomUUID()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+        });
+
+        verify(workoutRepository, times(1)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw ResourceNotFoundException if no workout is found" +
+            "for currentWorkoutExercises")
+    void getUniqueWorkoutExercises_noWorkoutFoundCurrentWorkoutExercises() throws Exception {
+        UUID oldWorkoutId = UUID.randomUUID();
+        UUID currentWorkoutId = UUID.randomUUID();
+
+        when(workoutRepository.findById(oldWorkoutId))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        when(workoutRepository.findById(currentWorkoutId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+        });
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the old workout")
+    void getUniqueWorkoutExercises_invalidOldWorkoutExercisesCheckOwnership() throws Exception {
+        when(authentication.getPrincipal())
+                .thenReturn(USER_RECORD)
+                .thenReturn(USER_RECORD_2);
+
+        when(workoutRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        assertThrows(UnauthorizedAccessException.class, () -> {
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+        });
+
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
+    }
+
+    @Test
+    @DisplayName("should throw UnauthorizedAccessException " +
+            "if user is not the owner of the current workout")
+    void getUniqueWorkoutExercises_invalidCurrentWorkoutExercisesCheckOwnership() throws Exception {
+        when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
+        when(workoutRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(WORKOUT_RECORD));
+
+        assertThrows(UnauthorizedAccessException.class, () -> {
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+        });
+
+        verify(workoutRepository, times(1)).findById(any(UUID.class));
+    }
 }
 

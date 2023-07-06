@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class ExerciseRepositoryTest {
@@ -30,13 +30,13 @@ class ExerciseRepositoryTest {
     private UserRepository userRepository;
 
     @AfterEach
-    void tearDown() throws Exception{
+    void tearDown() throws Exception {
         subject.deleteAll();
     }
 
     @Test
     @DisplayName("should return a list of exercises by user id")
-    void findByUserId() throws Exception{
+    void findByUserId() throws Exception {
         User USER_RECORD = new User("username", "email",
                 "password", Role.ROLE_USER);
         userRepository.save(USER_RECORD);

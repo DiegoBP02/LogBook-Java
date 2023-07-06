@@ -116,8 +116,8 @@ public class WorkoutService {
     }
 
     public List<ExerciseComparator> compareWorkouts(UUID oldWorkoutId, UUID currentWorkoutId) {
-        List<Exercise> oldWorkoutExercises = findById(oldWorkoutId).getExercises();
-        List<Exercise> currentWorkoutExercises = findById(currentWorkoutId).getExercises();
+        List<Exercise> oldWorkoutExercises = getExercisesFromWorkout(oldWorkoutId);
+        List<Exercise> currentWorkoutExercises = getExercisesFromWorkout(currentWorkoutId);
 
         List<ExerciseComparator> result = new ArrayList<>();
 
@@ -151,9 +151,55 @@ public class WorkoutService {
         return result;
     }
 
+    public List<Exercise> getUniqueWorkoutExercises
+            (UUID oldWorkoutId, UUID currentWorkoutId, boolean isOldWorkout) {
+        List<Exercise> workoutExercises = getExercisesFromWorkout(isOldWorkout ? oldWorkoutId : currentWorkoutId);
+        List<Exercise> otherWorkoutExercises = getExercisesFromWorkout(isOldWorkout ? currentWorkoutId : oldWorkoutId);
+
+        List<Exercise> commonExercises =
+                getCommonExercises(workoutExercises, otherWorkoutExercises);
+
+        return removeExercisesInCommon(workoutExercises, commonExercises);
+    }
+
+    private List<Exercise> getExercisesFromWorkout(UUID workoutId) {
+        return findById(workoutId).getExercises();
+    }
+
+    private List<Exercise> getCommonExercises
+            (List<Exercise> workoutExercises, List<Exercise> otherWorkoutExercises) {
+        List<Exercise> commonExercises = new ArrayList<>();
+
+        for (Exercise oldExercise : workoutExercises) {
+            for (Exercise currentExercise : otherWorkoutExercises) {
+                if (oldExercise.getName().equalsIgnoreCase(currentExercise.getName())) {
+                    commonExercises.add(oldExercise);
+                    break;
+                }
+            }
+        }
+
+        return commonExercises;
+    }
+
+    private List<Exercise> removeExercisesInCommon
+            (List<Exercise> exercisesList, List<Exercise> commonExercises) {
+        List<Exercise> exercises = new ArrayList<>(exercisesList);
+
+        exercises.removeIf(currentExercise -> {
+            for (Exercise commonExercise : commonExercises) {
+                if (currentExercise.getName().equalsIgnoreCase(commonExercise.getName())) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return exercises;
+    }
+
     private User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
     }
-
 }
