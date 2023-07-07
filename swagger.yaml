@@ -1,0 +1,546 @@
+openapi: 3.0.1
+info:
+  title: OpenApi specification
+  description: OpenApi documentation
+  contact:
+    name: Diego
+    url: https://portfolio-diegobp.netlify.app
+    email: diegobpdev@gmail.com
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+    description: Local ENV
+security:
+  - bearerAuth: []
+paths:
+  /workouts:
+    get:
+      tags:
+        - workout-controller
+      operationId: findAll
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workout"
+    post:
+      tags:
+        - workout-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Workout"
+  /exercises:
+    get:
+      tags:
+        - exercise-controller
+      operationId: findAll_1
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exercise"
+    post:
+      tags:
+        - exercise-controller
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciseDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Exercise"
+  /auth/register:
+    post:
+      tags:
+        - auth-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  /auth/login:
+    post:
+      tags:
+        - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: string
+  /workouts/{id}:
+    get:
+      tags:
+        - workout-controller
+      operationId: findById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Workout"
+    delete:
+      tags:
+        - workout-controller
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Workout"
+    patch:
+      tags:
+        - workout-controller
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Workout"
+  /exercises/{id}:
+    get:
+      tags:
+        - exercise-controller
+      operationId: findById_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Exercise"
+    delete:
+      tags:
+        - exercise-controller
+      operationId: delete_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Exercise"
+    patch:
+      tags:
+        - exercise-controller
+      operationId: update_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciseDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Exercise"
+  /workouts/volumeLoad/{id}:
+    get:
+      tags:
+        - workout-controller
+      operationId: getVolumeLoad
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+  /workouts/uniqueOldExercises/{oldWorkoutId}/{currentWorkoutId}:
+    get:
+      tags:
+        - workout-controller
+      operationId: getUniqueOldWorkoutExercises
+      parameters:
+        - name: oldWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: currentWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exercise"
+  /workouts/uniqueCurrentExercises/{oldWorkoutId}/{currentWorkoutId}:
+    get:
+      tags:
+        - workout-controller
+      operationId: getUniqueCurrentWorkoutExercises
+      parameters:
+        - name: oldWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: currentWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exercise"
+  /workouts/exercisesOutsideRepRange/{id}:
+    get:
+      tags:
+        - workout-controller
+      operationId: getExercisesOutsideRepsRange
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Exercise"
+  /workouts/date/{date}/{muscle}:
+    get:
+      tags:
+        - workout-controller
+      operationId: findByDateAndMuscle
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: muscle
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Workout"
+  /workouts/compareWorkouts/{oldWorkoutId}/{currentWorkoutId}:
+    get:
+      tags:
+        - workout-controller
+      operationId: getWorkoutsComparison
+      parameters:
+        - name: oldWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: currentWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExerciseComparator"
+components:
+  schemas:
+    WorkoutDto:
+      required:
+        - date
+        - lowerRepsRange
+        - muscle
+        - upperRepsRange
+      type: object
+      properties:
+        muscle:
+          type: string
+          enum:
+            - CHEST
+            - BACK
+            - SHOULDERS
+            - LEGS
+            - BICEPS
+            - TRICEPS
+            - CALVES
+            - ABDOMINAL
+            - FULL_BODY
+        date:
+          type: string
+          format: date
+        lowerRepsRange:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+        upperRepsRange:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        reps:
+          type: integer
+          format: int32
+        weight:
+          type: integer
+          format: int32
+        rir:
+          type: integer
+          format: int32
+    Workout:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        muscle:
+          type: string
+          enum:
+            - CHEST
+            - BACK
+            - SHOULDERS
+            - LEGS
+            - BICEPS
+            - TRICEPS
+            - CALVES
+            - ABDOMINAL
+            - FULL_BODY
+        date:
+          type: string
+          format: date
+        lowerRepsRange:
+          type: integer
+          format: int32
+        upperRepsRange:
+          type: integer
+          format: int32
+        exercises:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exercise"
+    ExerciseDto:
+      required:
+        - name
+        - reps
+        - rir
+        - weight
+        - workoutId
+      type: object
+      properties:
+        name:
+          type: string
+        workoutId:
+          type: string
+          format: uuid
+        reps:
+          maximum: 50
+          minimum: 0
+          type: integer
+          format: int32
+        weight:
+          maximum: 1500
+          minimum: 0
+          type: integer
+          format: int32
+        rir:
+          maximum: 10
+          minimum: 0
+          type: integer
+          format: int32
+    RegisterDTO:
+      required:
+        - email
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 20
+          minLength: 3
+          type: string
+        password:
+          maxLength: 30
+          minLength: 4
+          type: string
+        email:
+          type: string
+    LoginDTO:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 20
+          minLength: 3
+          type: string
+        password:
+          maxLength: 30
+          minLength: 4
+          type: string
+    ExerciseComparator:
+      type: object
+      properties:
+        name:
+          type: string
+        repsDifference:
+          type: integer
+          format: int32
+        weightDifference:
+          type: integer
+          format: int32
+        rirDifference:
+          type: integer
+          format: int32
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT Bearer token
+      scheme: bearer
+      bearerFormat: JWT

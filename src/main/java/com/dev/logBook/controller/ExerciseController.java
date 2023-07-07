@@ -3,12 +3,12 @@ package com.dev.logBook.controller;
 import com.dev.logBook.dtos.ExerciseDto;
 import com.dev.logBook.entities.Exercise;
 import com.dev.logBook.services.ExerciseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;

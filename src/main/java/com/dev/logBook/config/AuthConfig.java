@@ -28,7 +28,13 @@ public class AuthConfig {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeHttpRequests()
-                .antMatchers(HttpMethod.POST, "/auth/login", "/auth/register")
+                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register")
+                .permitAll()
+                .requestMatchers(
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**"
+                )
                 .permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(filterToken, UsernamePasswordAuthenticationFilter.class)
