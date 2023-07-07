@@ -1,5 +1,15 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Landing, Error } from "./pages";
+
 function App() {
-  return <h2>App</h2>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/landing" element={<Landing />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
