@@ -373,6 +373,42 @@ class WorkoutControllerTest extends ApplicationConfigTest {
 
     @Test
     @WithMockUser
+    @DisplayName("should return a list of workouts")
+    void findWorkoutsByMuscle_success() throws Exception {
+        List<Workout> workouts = Collections.singletonList(WORKOUT_RECORD);
+        when(workoutService.findWorkoutsByMuscle(any(Muscles.class)))
+                .thenReturn(workouts);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/muscle/" + WORKOUT_RECORD.getMuscle())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(workouts.size())))
+                .andExpect(jsonPath("$[0].id", is(WORKOUT_RECORD.getId().toString())));
+
+        verify(workoutService, times(1))
+                .findWorkoutsByMuscle(any(Muscles.class));
+    }
+
+    @Test
+    @DisplayName("should return 403 - Forbidden if user is not authenticated")
+    void findWorkoutsByMuscle_invalidUser() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .get(PATH + "/muscle/" + WORKOUT_RECORD.getMuscle())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertEquals
+                        ("Access Denied", result.getResponse().getErrorMessage()));
+
+        verify(workoutService, never()).findWorkoutsByMuscle(any(Muscles.class));
+    }
+
+    @Test
+    @WithMockUser
     @DisplayName("should return a list of exercises")
     void getExercisesOutsideRepsRange_success() throws Exception {
         List<Exercise> exercises = Collections.singletonList(EXERCISE_RECORD);

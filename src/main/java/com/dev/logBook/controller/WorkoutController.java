@@ -65,6 +65,17 @@ public class WorkoutController {
         }
     }
 
+    @GetMapping(value = "/muscle/{muscle}")
+    public ResponseEntity<List<Workout>> findWorkoutsByMuscle(@PathVariable String muscle) {
+        try {
+            Muscles isValidMuscle = Muscles.valueOf(muscle.toUpperCase());
+            List<Workout> workouts = workoutService.findWorkoutsByMuscle(isValidMuscle);
+            return ResponseEntity.ok().body(workouts);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidMuscleEnumException(muscle);
+        }
+    }
+
     @GetMapping(value = "/exercisesOutsideRepRange/{id}")
     public ResponseEntity<List<Exercise>> getExercisesOutsideRepsRange
             (@PathVariable UUID id) {

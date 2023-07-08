@@ -65,6 +65,11 @@ public class WorkoutService {
         return workout;
     }
 
+    public List<Workout> findWorkoutsByMuscle(Muscles muscle) {
+        User user = getCurrentUser();
+        return workoutRepository.findByMuscleAndUserId(muscle, user.getId());
+    }
+
     public Workout update(UUID id, WorkoutDto workoutDto) {
         Workout workout = findById(id);
         updateData(workout, workoutDto);

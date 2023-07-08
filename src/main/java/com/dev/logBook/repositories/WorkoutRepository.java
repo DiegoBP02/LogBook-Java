@@ -16,4 +16,5 @@ public interface WorkoutRepository extends JpaRepository<Workout, UUID> {
 
     Optional<Workout> findByDateAndMuscleAndUserId(LocalDate date, Muscles muscle, UUID userId);
 
+    List<Workout> findByMuscleAndUserId(Muscles muscle, UUID userId);
 }

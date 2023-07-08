@@ -659,5 +659,20 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
         verify(workoutRepository, times(1)).findById(any(UUID.class));
     }
+
+    @Test
+    @DisplayName("should return a list of workouts")
+    void findByMuscleAndUserId_successful() throws Exception {
+        List<Workout> workoutList = Collections.singletonList(WORKOUT_RECORD);
+        when(workoutRepository.findByMuscleAndUserId(any(Muscles.class), any(UUID.class)))
+                .thenReturn(workoutList);
+
+        List<Workout> result = workoutService.findWorkoutsByMuscle(WORKOUT_RECORD.getMuscle());
+
+        assertEquals(workoutList, result);
+
+        verify(workoutRepository, times(1))
+                .findByMuscleAndUserId(any(Muscles.class), any(UUID.class));
+    }
 }
 
