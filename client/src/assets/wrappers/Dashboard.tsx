@@ -10,7 +10,7 @@ const Wrapper = styled.main`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
-    margin-top: 4rem;
+    margin: 4rem 0;
   }
   .singleMuscle {
     height: 180px;

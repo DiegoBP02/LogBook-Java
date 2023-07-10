@@ -3,6 +3,9 @@ import reducer, { ActionType } from "./reducer";
 import {
   CLEAR_ALERT,
   DISPLAY_ALERT,
+  GET_MUSCLES_BEGIN,
+  GET_MUSCLES_ERROR,
+  GET_MUSCLES_SUCCESS,
   LOGOUT_USER,
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
@@ -26,6 +29,8 @@ export type InitialStateProps = {
   userToken: string;
   isLoading: boolean;
   logoutUser: () => Promise<void>;
+  getAllMuscles: () => Promise<void>;
+  muscles: string[];
 };
 
 export const initialState: InitialStateProps = {
@@ -38,6 +43,8 @@ export const initialState: InitialStateProps = {
   userToken: token || "",
   isLoading: false,
   logoutUser: async () => {},
+  getAllMuscles: async () => {},
+  muscles: [],
 };
 
 const AppContext = React.createContext<InitialStateProps>(initialState);
@@ -115,7 +122,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     } catch (error: any) {
       dispatch({
         type: SETUP_USER_ERROR,
-        payload: { msg: error.response.data.message },
+        payload: { message: error.response.data.message },
       });
     }
     clearAlert();
@@ -134,9 +141,32 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     removeTokenFromLocalStorage();
   };
 
+  const getAllMuscles = async () => {
+    dispatch({ type: GET_MUSCLES_BEGIN });
+    try {
+      const { data } = await authToken.get("/muscles");
+      dispatch({
+        type: GET_MUSCLES_SUCCESS,
+        payload: data,
+      });
+    } catch (error: any) {
+      dispatch({
+        type: GET_MUSCLES_ERROR,
+        payload: { message: error.response.data.message },
+      });
+    }
+  };
+
   return (
     <AppContext.Provider
-      value={{ ...state, displayAlert, clearAlert, setupUser, logoutUser }}
+      value={{
+        ...state,
+        displayAlert,
+        clearAlert,
+        setupUser,
+        logoutUser,
+        getAllMuscles,
+      }}
     >
       {children}
     </AppContext.Provider>

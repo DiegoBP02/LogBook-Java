@@ -1,6 +1,9 @@
 import {
   CLEAR_ALERT,
   DISPLAY_ALERT,
+  GET_MUSCLES_BEGIN,
+  GET_MUSCLES_ERROR,
+  GET_MUSCLES_SUCCESS,
   LOGOUT_USER,
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
@@ -52,13 +55,35 @@ const reducer: React.Reducer<InitialStateProps, ActionType> = (
         isLoading: false,
         showAlert: true,
         alertType: "danger",
-        alertText: action.payload.msg,
+        alertText: action.payload.message,
       };
     case LOGOUT_USER:
       return {
         ...state,
         userToken: "",
       };
+    case GET_MUSCLES_BEGIN:
+      return {
+        ...state,
+        isLoading: true,
+      };
+
+    case GET_MUSCLES_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        muscles: action.payload,
+      };
+
+    case GET_MUSCLES_ERROR:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: "danger",
+        alertText: action.payload.message,
+      };
+
     default:
       throw new Error(`No such action :${action.type}`);
   }

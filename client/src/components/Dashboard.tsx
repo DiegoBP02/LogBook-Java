@@ -1,16 +1,16 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import bicepsImg from "../assets/images/muscles/biceps.svg";
 import Wrapper from "../assets/wrappers/Dashboard";
 import { Loading } from ".";
+import { useAppContext } from "../context/appContext";
 
 const Dashboard = () => {
-  const isLoading: boolean = false; // temporary
+  const { isLoading, getAllMuscles, muscles } = useAppContext();
 
-  const muscles = [
-    // temporary
-    { name: "biceps", _id: 1 },
-    { name: "triceps", _id: 2 },
-  ];
+  useEffect(() => {
+    getAllMuscles();
+  }, []);
 
   return (
     <Wrapper>
@@ -19,15 +19,15 @@ const Dashboard = () => {
       ) : (
         <>
           <main className="muscles">
-            {muscles.map(({ name: muscle, _id: muscleId }, index) => {
+            {muscles.map((muscle, index) => {
               return (
                 <Link
-                  to={`/singleMuscle/${muscleId}`}
+                  to={`/singleMuscle/${muscle}`}
                   className="singleMuscle"
                   key={index}
                 >
                   {muscle}
-                  <img src={bicepsImg} alt="" />
+                  <img src={bicepsImg} alt="muscle image" />
                 </Link>
               );
             })}
