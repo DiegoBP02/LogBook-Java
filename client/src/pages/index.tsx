@@ -1,6 +1,7 @@
 import Error from "./Error";
 import Landing from "./Landing";
-import Register from "./Register";
+import ProtectedRoute from "./ProtectedRoute";
+import AuthPage from "./AuthPage";
 import SharedLayout from "./SharedLayout";
 
-export { Landing, Error, SharedLayout, Register };
+export { Landing, Error, SharedLayout, AuthPage, ProtectedRoute };

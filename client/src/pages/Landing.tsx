@@ -1,11 +1,15 @@
 import Wrapper from "../assets/wrappers/Landing";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import landing from "../assets/images/landing/landing.svg";
 import { Logo } from "../components";
+import { useAppContext } from "../context/appContext";
 
 const Landing = () => {
+  const { userToken } = useAppContext();
+
   return (
     <>
+      {userToken && <Navigate to="/" />}
       <Wrapper>
         <Logo />
         <div className="container page">
@@ -16,7 +20,7 @@ const Landing = () => {
               aliquid voluptates, explicabo rem nesciunt eum consequuntur
               consectetur veritatis optio amet sunt.
             </p>
-            <Link to="/register" className="btn btn-hero">
+            <Link to="/auth" className="btn btn-hero">
               Login / Register
             </Link>
           </div>

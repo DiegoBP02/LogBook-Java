@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo, FormRow, Alert } from "../components";
 import Wrapper from "../assets/wrappers/Register";
 import { useAppContext } from "../context/appContext";
+import { useNavigate } from "react-router-dom";
 
 interface InitialStateProps {
   username: string;
@@ -18,7 +19,10 @@ const initialState: InitialStateProps = {
 };
 
 function Register() {
-  const { showAlert, displayAlert, setupUser, isLoading } = useAppContext();
+  const { showAlert, displayAlert, setupUser, isLoading, userToken } =
+    useAppContext();
+
+  const navigate = useNavigate();
 
   const [values, setValues] = useState<InitialStateProps>(initialState);
 
@@ -45,6 +49,14 @@ function Register() {
       setupUser(currentUser, "register", "User created! Redirecting...");
     }
   };
+
+  useEffect(() => {
+    if (userToken) {
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    }
+  }, [userToken, navigate]);
 
   return (
     <Wrapper className="full-page ">

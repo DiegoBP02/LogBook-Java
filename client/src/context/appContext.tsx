@@ -1,13 +1,16 @@
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useContext, useReducer } from "react";
 import reducer, { ActionType } from "./reducer";
 import {
   CLEAR_ALERT,
   DISPLAY_ALERT,
+  LOGOUT_USER,
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
   SETUP_USER_SUCCESS,
 } from "./actions";
 import axios from "axios";
+
+const token = localStorage.getItem("token");
 
 export type InitialStateProps = {
   displayAlert: () => void;
@@ -22,6 +25,7 @@ export type InitialStateProps = {
   ) => Promise<void>;
   userToken: string;
   isLoading: boolean;
+  logoutUser: () => Promise<void>;
 };
 
 export const initialState: InitialStateProps = {
@@ -31,8 +35,9 @@ export const initialState: InitialStateProps = {
   alertType: "",
   clearAlert: () => {},
   setupUser: async () => {},
-  userToken: "",
+  userToken: token || "",
   isLoading: false,
+  logoutUser: async () => {},
 };
 
 const AppContext = React.createContext<InitialStateProps>(initialState);
@@ -69,6 +74,19 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   );
 
+  authToken.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error.response.status === 401) {
+        console.log("Unauthorized error!");
+        logoutUser();
+      }
+      return Promise.reject(error);
+    }
+  );
+
   const displayAlert = () => {
     dispatch({ type: DISPLAY_ALERT });
     clearAlert();
@@ -93,18 +111,32 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         type: SETUP_USER_SUCCESS,
         payload: { token: data, alertText },
       });
+      addTokenToLocalStorage(data);
     } catch (error: any) {
       dispatch({
         type: SETUP_USER_ERROR,
-        payload: { msg: error.response.data.msg },
+        payload: { msg: error.response.data.message },
       });
     }
     clearAlert();
   };
 
+  const addTokenToLocalStorage = (token: string) => {
+    localStorage.setItem("token", token);
+  };
+
+  const removeTokenFromLocalStorage = () => {
+    localStorage.removeItem("token");
+  };
+
+  const logoutUser = async () => {
+    dispatch({ type: LOGOUT_USER });
+    removeTokenFromLocalStorage();
+  };
+
   return (
     <AppContext.Provider
-      value={{ ...state, displayAlert, clearAlert, setupUser }}
+      value={{ ...state, displayAlert, clearAlert, setupUser, logoutUser }}
     >
       {children}
     </AppContext.Provider>

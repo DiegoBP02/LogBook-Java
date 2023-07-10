@@ -1,13 +1,26 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Landing, Error, SharedLayout, Register } from "./pages";
+import {
+  Landing,
+  Error,
+  SharedLayout,
+  AuthPage,
+  ProtectedRoute,
+} from "./pages";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SharedLayout />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <SharedLayout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/landing" element={<Landing />} />
-        <Route path="/auth" element={<Register />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>

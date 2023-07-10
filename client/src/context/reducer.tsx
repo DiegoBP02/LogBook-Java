@@ -1,6 +1,7 @@
 import {
   CLEAR_ALERT,
   DISPLAY_ALERT,
+  LOGOUT_USER,
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
   SETUP_USER_SUCCESS,
@@ -52,6 +53,11 @@ const reducer: React.Reducer<InitialStateProps, ActionType> = (
         showAlert: true,
         alertType: "danger",
         alertText: action.payload.msg,
+      };
+    case LOGOUT_USER:
+      return {
+        ...state,
+        userToken: "",
       };
     default:
       throw new Error(`No such action :${action.type}`);
