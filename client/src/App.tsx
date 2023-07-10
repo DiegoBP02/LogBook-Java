@@ -5,6 +5,7 @@ import {
   SharedLayout,
   AuthPage,
   ProtectedRoute,
+  SingleMuscle,
 } from "./pages";
 
 function App() {
@@ -16,6 +17,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SharedLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/singleMuscle/:muscle"
+          element={
+            <ProtectedRoute>
+              <SingleMuscle />
             </ProtectedRoute>
           }
         />

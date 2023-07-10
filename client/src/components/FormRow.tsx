@@ -5,6 +5,8 @@ interface FormRowProps {
   handleChange?: React.ChangeEventHandler<HTMLInputElement>;
   noLabel?: boolean;
   labelText?: string;
+  min?: string | number;
+  max?: string | number;
 }
 
 const FormRow = ({
@@ -14,6 +16,8 @@ const FormRow = ({
   handleChange,
   labelText,
   noLabel,
+  min,
+  max,
 }: FormRowProps) => {
   return (
     <div className="form-row">
@@ -29,6 +33,8 @@ const FormRow = ({
         autoComplete="on"
         onChange={handleChange}
         className="form-input"
+        min={min}
+        max={max}
       />
     </div>
   );
