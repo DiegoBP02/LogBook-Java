@@ -18,14 +18,15 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity(name = "users")
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
+    @Column(unique = true)
     private String username;
+    @Column(unique = true)
     private String email;
     private String password;
     private Role role;
