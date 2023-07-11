@@ -6,6 +6,7 @@ import {
   AuthPage,
   ProtectedRoute,
   SingleMuscle,
+  SingleWorkout,
 } from "./pages";
 
 function App() {
@@ -25,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SingleMuscle />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/singleWorkout/:workoutId"
+          element={
+            <ProtectedRoute>
+              <SingleWorkout />
             </ProtectedRoute>
           }
         />

@@ -8,9 +8,9 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isLoading, userToken } = useAppContext();
+  const { userLoading, userToken } = useAppContext();
 
-  if (isLoading) return <Loading />;
+  if (userLoading) return <Loading />;
 
   if (!userToken) {
     return <Navigate to="/landing" />;

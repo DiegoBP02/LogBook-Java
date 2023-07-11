@@ -7,6 +7,7 @@ interface FormRowProps {
   labelText?: string;
   min?: string | number;
   max?: string | number;
+  step?: string;
 }
 
 const FormRow = ({
@@ -18,6 +19,7 @@ const FormRow = ({
   noLabel,
   min,
   max,
+  step,
 }: FormRowProps) => {
   return (
     <div className="form-row">
@@ -35,6 +37,7 @@ const FormRow = ({
         className="form-input"
         min={min}
         max={max}
+        step={step}
       />
     </div>
   );

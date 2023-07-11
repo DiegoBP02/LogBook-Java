@@ -6,10 +6,10 @@ import Logo from "./Logo";
 import { useAppContext } from "../context/appContext";
 
 const Navbar = () => {
-  const { logoutUser } = useAppContext();
+  const { logoutUser, username } = useAppContext();
   const [showLogout, setShowLogout] = useState(false);
 
-  const firstName = "user"; // temporary
+  const firstName = username.split(" ")[0];
 
   return (
     <Wrapper>

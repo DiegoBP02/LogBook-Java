@@ -4,5 +4,14 @@ import ProtectedRoute from "./ProtectedRoute";
 import AuthPage from "./AuthPage";
 import SharedLayout from "./SharedLayout";
 import SingleMuscle from "./SingleMuscle";
+import SingleWorkout from "./SingleWorkout";
 
-export { Landing, Error, SharedLayout, AuthPage, ProtectedRoute, SingleMuscle };
+export {
+  Landing,
+  Error,
+  SharedLayout,
+  AuthPage,
+  ProtectedRoute,
+  SingleMuscle,
+  SingleWorkout,
+};

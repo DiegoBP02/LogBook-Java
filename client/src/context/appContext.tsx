@@ -16,16 +16,58 @@ import {
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
   SETUP_USER_SUCCESS,
+  GET_EXERCISES_BEGIN,
+  GET_EXERCISES_SUCCESS,
+  GET_EXERCISES_ERROR,
+  ADD_EXERCISE_BEGIN,
+  ADD_EXERCISE_SUCCESS,
+  ADD_EXERCISE_ERROR,
 } from "./actions";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 const token = localStorage.getItem("token");
+
+export interface CurrentUserProps {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface SetupUserProps {
+  currentUser: CurrentUserProps;
+  endPoint: "register" | "login";
+  alertText: string;
+}
 
 export interface WorkoutProps {
   date: string;
   id: string;
   lowerRepsRange: number;
   upperRepsRange: number;
+  muscle: string;
+}
+
+export interface ExerciseProps {
+  id: string;
+  name: string;
+  reps: number;
+  weight: number;
+  rir: number;
+}
+
+export interface AddWorkoutProps {
+  date: string;
+  muscle: string;
+  lowerRepsRange: number;
+  upperRepsRange: number;
+}
+
+export interface AddExerciseProps {
+  workoutId: string;
+  name: string;
+  reps: number;
+  weight: number;
+  rir: number;
 }
 
 export type InitialStateProps = {
@@ -34,24 +76,36 @@ export type InitialStateProps = {
   alertText: string;
   alertType: string;
   clearAlert: () => void;
-  setupUser: (
-    currentUser: object,
-    endPoint: "register" | "login",
-    alertText: string
-  ) => Promise<void>;
+  setupUser: ({
+    currentUser,
+    endPoint,
+    alertText,
+  }: SetupUserProps) => Promise<void>;
   userToken: string;
+  userLoading: boolean;
+  username: string;
   isLoading: boolean;
   logoutUser: () => Promise<void>;
   getAllMuscles: () => Promise<void>;
   muscles: string[];
   getWorkoutsByMuscle: (muscle: string) => Promise<void>;
   workouts: WorkoutProps[];
-  addWorkout: (
-    date: string,
-    muscle: string,
-    lowerRepsRange: number,
-    upperRepsRange: number
-  ) => Promise<void>;
+  addWorkout: ({
+    date,
+    muscle,
+    lowerRepsRange,
+    upperRepsRange,
+  }: AddWorkoutProps) => Promise<void>;
+  getExercises: (workoutId: string) => Promise<void>;
+  exercises: ExerciseProps[];
+  authToken: AxiosInstance;
+  addExercise: ({
+    workoutId,
+    name,
+    reps,
+    weight,
+    rir,
+  }: AddExerciseProps) => Promise<void>;
 };
 
 export const initialState: InitialStateProps = {
@@ -62,13 +116,19 @@ export const initialState: InitialStateProps = {
   clearAlert: () => {},
   setupUser: async () => {},
   userToken: token || "",
+  userLoading: false,
+  username: "",
   isLoading: false,
   logoutUser: async () => {},
   getAllMuscles: async () => {},
   muscles: [],
   getWorkoutsByMuscle: async (muscle) => {},
   workouts: [],
-  addWorkout: async (date, muscle, lowerRepsRange, upperRepsRange) => {},
+  addWorkout: async ({ date, muscle, lowerRepsRange, upperRepsRange }) => {},
+  getExercises: async (workoutId) => {},
+  exercises: [],
+  authToken: axios.create(),
+  addExercise: async ({ workoutId, name, reps, weight, rir }) => {},
 };
 
 const AppContext = React.createContext<InitialStateProps>(initialState);
@@ -129,18 +189,18 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }, 3000);
   };
 
-  const setupUser = async (
-    currentUser: object,
-    endPoint: "register" | "login",
-    alertText: string
-  ) => {
+  const setupUser = async ({
+    currentUser,
+    endPoint,
+    alertText,
+  }: SetupUserProps) => {
     dispatch({ type: SETUP_USER_BEGIN });
 
     try {
       const { data } = await authFetch.post(`/auth/${endPoint}`, currentUser);
       dispatch({
         type: SETUP_USER_SUCCESS,
-        payload: { token: data, alertText },
+        payload: { token: data, alertText, username: currentUser.username },
       });
       addTokenToLocalStorage(data);
     } catch (error: any) {
@@ -187,11 +247,18 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       const { data } = await authToken.get(`/workouts/muscle/${muscle}`);
       const musclesData = data.map(
-        ({ date, id, lowerRepsRange, upperRepsRange }: WorkoutProps) => ({
+        ({
           date,
           id,
           lowerRepsRange,
           upperRepsRange,
+          muscle,
+        }: WorkoutProps) => ({
+          date,
+          id,
+          lowerRepsRange,
+          upperRepsRange,
+          muscle,
         })
       );
 
@@ -205,25 +272,44 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     clearAlert();
   };
 
-  const addWorkout = async (
-    date: string,
-    muscle: string,
-    lowerRepsRange: number,
-    upperRepsRange: number
-  ) => {
+  const addWorkout = async (data: AddWorkoutProps) => {
     dispatch({ type: ADD_WORKOUT_BEGIN });
     try {
-      await authToken.post("/workouts", {
-        date,
-        muscle,
-        lowerRepsRange,
-        upperRepsRange,
-      });
+      await authToken.post("/workouts", data);
       dispatch({ type: ADD_WORKOUT_SUCCESS });
-      await getWorkoutsByMuscle(muscle);
+      await getWorkoutsByMuscle(data.muscle);
     } catch (error: any) {
       dispatch({
         type: ADD_WORKOUT_ERROR,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
+
+  const getExercises = async (workoutId: string) => {
+    dispatch({ type: GET_EXERCISES_BEGIN });
+    try {
+      const { data } = await authToken.get(`/workouts/${workoutId}`);
+      dispatch({ type: GET_EXERCISES_SUCCESS, payload: data.exercises });
+    } catch (error: any) {
+      dispatch({
+        type: GET_EXERCISES_ERROR,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
+
+  const addExercise = async (data: AddExerciseProps) => {
+    dispatch({ type: ADD_EXERCISE_BEGIN });
+    try {
+      await authToken.post("/exercises", data);
+      dispatch({ type: ADD_EXERCISE_SUCCESS });
+      await getExercises(data.workoutId);
+    } catch (error: any) {
+      dispatch({
+        type: ADD_EXERCISE_ERROR,
         payload: { message: error.response.data.message },
       });
     }
@@ -241,6 +327,9 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         getAllMuscles,
         getWorkoutsByMuscle,
         addWorkout,
+        getExercises,
+        authToken,
+        addExercise,
       }}
     >
       {children}

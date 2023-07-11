@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Logo, FormRow, Alert } from "../components";
 import Wrapper from "../assets/wrappers/Register";
-import { useAppContext } from "../context/appContext";
+import { useAppContext, CurrentUserProps } from "../context/appContext";
 import { useNavigate } from "react-router-dom";
 
 interface InitialStateProps {
@@ -42,11 +42,19 @@ function Register() {
       return;
     }
 
-    const currentUser = { username, email, password };
+    const currentUser: CurrentUserProps = { username, email, password };
     if (isMember) {
-      setupUser(currentUser, "login", "Login successful! Redirecting...");
+      setupUser({
+        currentUser,
+        endPoint: "login",
+        alertText: "Login successful! Redirecting...",
+      });
     } else {
-      setupUser(currentUser, "register", "User created! Redirecting...");
+      setupUser({
+        currentUser,
+        endPoint: "register",
+        alertText: "User created! Redirecting...",
+      });
     }
   };
 

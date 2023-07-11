@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Navbar, Modal, Loading } from "../components";
 import { AddWorkout } from "../components";
 import Wrapper from "../assets/wrappers/SingleMuscle";
-import { useAppContext } from "../context/appContext";
+import { AddWorkoutProps, useAppContext } from "../context/appContext";
 import moment from "moment";
 
 const initialState = {
@@ -19,7 +19,7 @@ const SingleMuscle = () => {
   const [date, setDate] = useState<string>("");
   const [selected, setSelected] = useState<boolean>(false);
 
-  const { muscle } = useParams();
+  const { muscle } = useParams() as { muscle: string };
 
   const handleSelect = () => {
     if (selected) {
@@ -51,18 +51,20 @@ const SingleMuscle = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    handleClick();
-    addWorkout(
+    const data: AddWorkoutProps = {
       date,
-      muscle as string,
-      values.lowerRepsRange,
-      values.upperRepsRange
-    );
+      muscle: muscle,
+      lowerRepsRange: values.lowerRepsRange,
+      upperRepsRange: values.upperRepsRange,
+    };
+
+    handleClick();
+    addWorkout(data);
     setDate("");
   };
 
   useEffect(() => {
-    getWorkoutsByMuscle(muscle as string);
+    getWorkoutsByMuscle(muscle);
   }, []);
 
   if (isLoading)
@@ -85,7 +87,7 @@ const SingleMuscle = () => {
 
           return (
             <Link
-              to={`/singleExercise/${"x"}`}
+              to={`/singleWorkout/${workoutProperty.id}`}
               key={index}
               className="singleWorkout"
             >
