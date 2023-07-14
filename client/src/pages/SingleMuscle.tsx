@@ -27,9 +27,9 @@ const SingleMuscle = () => {
       setDate("");
     } else {
       setSelected(true);
-
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().slice(0, 10);
+      const currentDate = new Date().toLocaleDateString();
+      const [day, month, year] = currentDate.split("/");
+      const formattedDate = [year, month, day].join("-");
       setDate(formattedDate);
     }
   };
@@ -39,8 +39,14 @@ const SingleMuscle = () => {
   };
 
   const handleDate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = new Date(e.target.value);
-    const formattedDate = selectedDate.toLocaleDateString("en-CA");
+    const selectedDate = Date.parse(e.target.value);
+
+    if (isNaN(selectedDate)) {
+      console.log("Invalid date");
+      return;
+    }
+
+    const formattedDate = new Date(selectedDate).toISOString().split("T")[0];
     setDate(formattedDate);
   };
 
@@ -57,7 +63,6 @@ const SingleMuscle = () => {
       lowerRepsRange: values.lowerRepsRange,
       upperRepsRange: values.upperRepsRange,
     };
-
     handleClick();
     addWorkout(data);
     setDate("");

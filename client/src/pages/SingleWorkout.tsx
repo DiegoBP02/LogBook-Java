@@ -4,9 +4,15 @@ import Wrapper from "../assets/wrappers/SingleWorkout";
 import {
   AddExerciseProps,
   ExerciseProps,
+  WorkoutProps,
   useAppContext,
 } from "../context/appContext";
-import { Navbar, Loading, SingleExerciseForm } from "../components";
+import {
+  Navbar,
+  Loading,
+  SingleExerciseForm,
+  UniqueExercises,
+} from "../components";
 
 export interface InitialStateProps {
   name: string;
@@ -36,9 +42,13 @@ const SingleWorkout = () => {
     workouts,
   } = useAppContext();
 
-  const currentMuscleWorkout = workouts.find(
+  const currentWorkout = workouts.find(
     (workout) => workout.id == workoutId
-  )?.muscle as string;
+  ) as WorkoutProps;
+
+  const currentWorkoutMuscle = currentWorkout.muscle;
+  const lowerRepsRange = currentWorkout.lowerRepsRange;
+  const upperRepsRanges = currentWorkout.upperRepsRange;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -70,7 +80,7 @@ const SingleWorkout = () => {
   const handleWorkoutRemove = async () => {
     try {
       await authToken.delete(`/workouts/${workoutId}`);
-      getWorkoutsByMuscle(currentMuscleWorkout);
+      getWorkoutsByMuscle(currentWorkoutMuscle);
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +120,9 @@ const SingleWorkout = () => {
           >
             <p>Set</p>
             <p>Exercise</p>
-            <p>Reps</p>
+            <p>
+              Reps ({lowerRepsRange} - {upperRepsRanges})
+            </p>
             <p>Weight</p>
             <p>RIR</p>
           </article>
@@ -121,7 +133,17 @@ const SingleWorkout = () => {
                 <div key={index} className="properties">
                   <p>{index + 1}</p>
                   <p>{exercise.name}</p>
-                  <p>{exercise.reps}</p>
+                  <p
+                    style={{
+                      color:
+                        exercise.reps < lowerRepsRange ||
+                        exercise.reps > upperRepsRanges
+                          ? "red"
+                          : undefined,
+                    }}
+                  >
+                    {exercise.reps}
+                  </p>
                   <p>{exercise.weight}</p>
                   <p>{exercise.rir}</p>
                   <p
@@ -144,9 +166,17 @@ const SingleWorkout = () => {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         values={values}
-        muscle={currentMuscleWorkout}
-        handleWorkoutRemove={handleWorkoutRemove}
       />
+      <UniqueExercises workouts={workouts} currentWorkout={currentWorkout} />
+      <p style={{ textAlign: "center", maxWidth: "auto" }}>
+        <Link
+          to={`/singleMuscle/${currentWorkoutMuscle}`}
+          style={{ color: "red", maxWidth: "auto" }}
+          onClick={handleWorkoutRemove}
+        >
+          Remove workout
+        </Link>
+      </p>
     </Wrapper>
   );
 };

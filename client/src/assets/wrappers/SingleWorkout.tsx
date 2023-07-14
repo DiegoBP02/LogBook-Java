@@ -36,6 +36,18 @@ const Wrapper = styled.div`
   .properties p {
     margin: 0;
   }
+  .propertiesUniqueExercises {
+    display: grid;
+    place-items: center;
+    margin: 0 auto;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #d0d0d0;
+    align-items: start;
+  }
+
+  .propertiesUniqueExercises p {
+    text-align: center;
+  }
 `;
 
 export default Wrapper;

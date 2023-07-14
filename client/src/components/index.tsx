@@ -7,7 +7,7 @@ import Alert from "./Alert";
 import AddWorkout from "./AddWorkout";
 import Modal from "./Modal";
 import SingleExerciseForm from "./SingleExerciseForm";
-
+import UniqueExercises from "./UniqueExercises";
 export {
   Logo,
   Loading,
@@ -18,4 +18,5 @@ export {
   AddWorkout,
   Modal,
   SingleExerciseForm,
+  UniqueExercises,
 };

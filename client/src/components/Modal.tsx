@@ -44,6 +44,7 @@ const Modal = ({
             id="date"
             className="form-input dateInput"
             onChange={(e) => handleDate(e)}
+            min="2020-01-01"
           ></input>
 
           <div className="checkboxWrapper">
