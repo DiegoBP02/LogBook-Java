@@ -25,6 +25,8 @@ public class Exercise {
     private int reps;
     private int weight;
     private int rir;
+    @Column(name = "created_at", updatable = false)
+    private Long createdAt;
 
     @JsonIgnore
     @ManyToOne
@@ -35,6 +37,15 @@ public class Exercise {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public Exercise(UUID id, String name, int reps, int weight, int rir) {
+        this.id = id;
+        this.name = name;
+        this.reps = reps;
+        this.weight = weight;
+        this.rir = rir;
+        this.createdAt = System.currentTimeMillis();
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -35,6 +35,7 @@ public class ExerciseService {
                 .rir(exerciseDto.getRir())
                 .workout(workout)
                 .user(user)
+                .createdAt(System.currentTimeMillis())
                 .build();
 
         return exerciseRepository.save(exercise);

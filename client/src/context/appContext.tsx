@@ -53,6 +53,7 @@ export interface ExerciseProps {
   reps: number;
   weight: number;
   rir: number;
+  createdAt: number;
 }
 
 export interface AddWorkoutProps {

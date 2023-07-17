@@ -28,7 +28,6 @@ public class ExerciseDto {
     @Min(0)
     @Max(1500)
     private int weight;
-    @NotNull
     @Min(0)
     @Max(10)
     private int rir;

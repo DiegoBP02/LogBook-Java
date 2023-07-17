@@ -8,6 +8,9 @@ import AddWorkout from "./AddWorkout";
 import Modal from "./Modal";
 import SingleExerciseForm from "./SingleExerciseForm";
 import UniqueExercises from "./UniqueExercises";
+import GetPreviousWorkoutExercises from "./GetPreviousWorkoutExercises";
+import LoadingText from "./LoadingText";
+
 export {
   Logo,
   Loading,
@@ -19,4 +22,6 @@ export {
   Modal,
   SingleExerciseForm,
   UniqueExercises,
+  GetPreviousWorkoutExercises,
+  LoadingText,
 };

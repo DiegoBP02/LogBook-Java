@@ -30,7 +30,7 @@ const Wrapper = styled.div`
     display: grid;
     place-items: center;
     margin: 0 auto;
-    grid-template-columns: 1fr 3fr 1fr 1fr 1fr 50px;
+    grid-template-columns: 1fr 2fr 2fr 1fr 1fr 25px 25px;
     border-bottom: 1px solid #d0d0d0;
   }
   .properties p {
@@ -47,6 +47,26 @@ const Wrapper = styled.div`
 
   .propertiesUniqueExercises p {
     text-align: center;
+    overflow-x: scroll;
+  }
+
+  .properties input {
+    max-width: 100%;
+    width: 3.5rem;
+    text-align: center;
+    height: 1.5rem;
+  }
+
+  .editInput {
+    cursor: pointer;
+    color: green;
+  }
+
+  @media (max-width: 992px) {
+    .nameInput {
+      overflow-x: auto;
+      max-width: 100px;
+    }
   }
 `;
 

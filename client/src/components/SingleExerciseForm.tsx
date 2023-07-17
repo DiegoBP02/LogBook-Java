@@ -39,14 +39,14 @@ const SingleExerciseForm = ({
             labelText="weight"
             min="1"
           />
-          <FormRow
+          {/* <FormRow
             type="number"
             labelText="RIR"
             name="rir"
             value={values.rir}
             handleChange={handleChange}
             min="0"
-          />
+          /> */}
         </div>
         <button type="submit" className="btn">
           Add Set
