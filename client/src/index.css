@@ -81,11 +81,6 @@ body {
   text-transform: capitalize;
 }
 
-p {
-  margin-bottom: 1.5rem;
-  max-width: 40em;
-}
-
 h1,
 h2,
 h3,

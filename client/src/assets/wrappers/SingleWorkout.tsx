@@ -13,7 +13,7 @@ const Wrapper = styled.div`
     padding: 0.5rem 0.625rem;
     background-color: #e0e0e0;
     position: relative;
-    margin-bottom: 5rem;
+    margin: 2rem auto;
   }
   .formWrapper {
     display: flex;
@@ -60,6 +60,12 @@ const Wrapper = styled.div`
   .editInput {
     cursor: pointer;
     color: green;
+  }
+
+  .center {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
   }
 
   @media (max-width: 992px) {

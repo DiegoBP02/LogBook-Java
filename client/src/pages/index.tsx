@@ -4,7 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import AuthPage from "./AuthPage";
 import SharedLayout from "./SharedLayout";
 import SingleMuscle from "./SingleMuscle";
-import SingleWorkout from "./SingleWorkout";
+import SingleWorkout from "./SingleWorkout/SingleWorkout";
 
 export {
   Landing,

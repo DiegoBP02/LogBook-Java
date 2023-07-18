@@ -1,15 +1,9 @@
 import {
-  ADD_EXERCISE_BEGIN,
-  ADD_EXERCISE_ERROR,
-  ADD_EXERCISE_SUCCESS,
   ADD_WORKOUT_BEGIN,
   ADD_WORKOUT_ERROR,
   ADD_WORKOUT_SUCCESS,
   CLEAR_ALERT,
   DISPLAY_ALERT,
-  GET_EXERCISES_BEGIN,
-  GET_EXERCISES_ERROR,
-  GET_EXERCISES_SUCCESS,
   GET_MUSCLES_BEGIN,
   GET_MUSCLES_ERROR,
   GET_MUSCLES_SUCCESS,
@@ -127,40 +121,7 @@ const reducer: React.Reducer<InitialStateProps, ActionType> = (
         alertType: "danger",
         alertText: action.payload.message,
       };
-    case GET_EXERCISES_BEGIN:
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case GET_EXERCISES_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        exercises: action.payload,
-      };
-    case GET_EXERCISES_ERROR:
-      return {
-        ...state,
-        isLoading: false,
-        showAlert: true,
-        alertType: "danger",
-        alertText: action.payload.message,
-      };
-    case ADD_EXERCISE_BEGIN:
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case ADD_EXERCISE_SUCCESS:
-      return { ...state, isLoading: false };
-    case ADD_EXERCISE_ERROR:
-      return {
-        ...state,
-        isLoading: false,
-        showAlert: true,
-        alertType: "danger",
-        alertText: action.payload.msg,
-      };
+
     default:
       throw new Error(`No such action :${action.type}`);
   }

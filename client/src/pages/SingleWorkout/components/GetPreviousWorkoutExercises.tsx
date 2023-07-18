@@ -1,28 +1,21 @@
-import { useState } from "react";
+import { WorkoutProps } from "../../../context/appContext";
+import moment from "moment";
 import {
   AddExerciseProps,
-  ExerciseProps,
-  WorkoutProps,
-  useAppContext,
-} from "../context/appContext";
-import moment from "moment";
+  ExerciseDBProps,
+  useExerciseContext,
+} from "../context/exerciseContext";
 
 interface GetPreviousWorkoutExercisesProps {
-  workoutId: string;
-  nearestExercises: ExerciseProps[] | undefined;
+  nearestExercises: ExerciseDBProps[] | undefined;
   nearestOldWorkout: WorkoutProps | undefined;
-  setAlreadySelectedPreviousWorkout: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
 }
 
 const GetPreviousWorkoutExercises = ({
-  workoutId,
   nearestExercises,
   nearestOldWorkout,
-  setAlreadySelectedPreviousWorkout,
 }: GetPreviousWorkoutExercisesProps) => {
-  const { addExercise } = useAppContext();
+  const { addExercise, currentWorkoutId } = useExerciseContext();
 
   const momentObject = moment(nearestOldWorkout?.date);
   const formattedDate = momentObject.format("DD/MM/YYYY");
@@ -30,7 +23,7 @@ const GetPreviousWorkoutExercises = ({
   const getPreviousWorkoutExercises = async () => {
     nearestExercises?.forEach((e) => {
       const exercise: AddExerciseProps = {
-        workoutId,
+        workoutId: currentWorkoutId,
         name: e.name,
         reps: e.reps,
         rir: e.rir,
@@ -38,11 +31,10 @@ const GetPreviousWorkoutExercises = ({
       };
       addExercise(exercise);
     });
-    setAlreadySelectedPreviousWorkout(true);
   };
 
   return (
-    <div>
+    <div className="center">
       <button
         className="btn"
         onClick={getPreviousWorkoutExercises}

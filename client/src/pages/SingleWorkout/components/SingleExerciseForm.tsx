@@ -1,17 +1,12 @@
-import FormRow from "./FormRow";
-import { InitialStateProps } from "../pages/SingleWorkout";
+import { FormRow } from "../../../components";
+import { useExerciseContext } from "../context/exerciseContext";
 
 interface SingleExerciseFormProps {
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  values: InitialStateProps;
 }
 
-const SingleExerciseForm = ({
-  handleChange,
-  handleSubmit,
-  values,
-}: SingleExerciseFormProps) => {
+const SingleExerciseForm = ({ handleSubmit }: SingleExerciseFormProps) => {
+  const { handleChange, values } = useExerciseContext();
   return (
     <form onSubmit={handleSubmit}>
       <div className="form">

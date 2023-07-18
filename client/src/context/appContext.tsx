@@ -16,13 +16,8 @@ import {
   SETUP_USER_BEGIN,
   SETUP_USER_ERROR,
   SETUP_USER_SUCCESS,
-  GET_EXERCISES_BEGIN,
-  GET_EXERCISES_SUCCESS,
-  GET_EXERCISES_ERROR,
-  ADD_EXERCISE_BEGIN,
-  ADD_EXERCISE_SUCCESS,
-  ADD_EXERCISE_ERROR,
 } from "./actions";
+
 import axios, { AxiosInstance } from "axios";
 
 const token = localStorage.getItem("token");
@@ -47,28 +42,11 @@ export interface WorkoutProps {
   muscle: string;
 }
 
-export interface ExerciseProps {
-  id: string;
-  name: string;
-  reps: number;
-  weight: number;
-  rir: number;
-  createdAt: number;
-}
-
 export interface AddWorkoutProps {
   date: string;
   muscle: string;
   lowerRepsRange: number;
   upperRepsRange: number;
-}
-
-export interface AddExerciseProps {
-  workoutId: string;
-  name: string;
-  reps: number;
-  weight: number;
-  rir: number;
 }
 
 export type InitialStateProps = {
@@ -97,16 +75,7 @@ export type InitialStateProps = {
     lowerRepsRange,
     upperRepsRange,
   }: AddWorkoutProps) => Promise<void>;
-  getExercises: (workoutId: string) => Promise<void>;
-  exercises: ExerciseProps[];
   authToken: AxiosInstance;
-  addExercise: ({
-    workoutId,
-    name,
-    reps,
-    weight,
-    rir,
-  }: AddExerciseProps) => Promise<void>;
 };
 
 export const initialState: InitialStateProps = {
@@ -126,10 +95,7 @@ export const initialState: InitialStateProps = {
   getWorkoutsByMuscle: async (muscle) => {},
   workouts: [],
   addWorkout: async ({ date, muscle, lowerRepsRange, upperRepsRange }) => {},
-  getExercises: async (workoutId) => {},
-  exercises: [],
   authToken: axios.create(),
-  addExercise: async ({ workoutId, name, reps, weight, rir }) => {},
 };
 
 const AppContext = React.createContext<InitialStateProps>(initialState);
@@ -288,35 +254,6 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     clearAlert();
   };
 
-  const getExercises = async (workoutId: string) => {
-    dispatch({ type: GET_EXERCISES_BEGIN });
-    try {
-      const { data } = await authToken.get(`/workouts/${workoutId}`);
-      dispatch({ type: GET_EXERCISES_SUCCESS, payload: data.exercises });
-    } catch (error: any) {
-      dispatch({
-        type: GET_EXERCISES_ERROR,
-        payload: { message: error.response.data.message },
-      });
-    }
-    clearAlert();
-  };
-
-  const addExercise = async (data: AddExerciseProps) => {
-    dispatch({ type: ADD_EXERCISE_BEGIN });
-    try {
-      await authToken.post("/exercises", data);
-      dispatch({ type: ADD_EXERCISE_SUCCESS });
-      await getExercises(data.workoutId);
-    } catch (error: any) {
-      dispatch({
-        type: ADD_EXERCISE_ERROR,
-        payload: { message: error.response.data.message },
-      });
-    }
-    clearAlert();
-  };
-
   return (
     <AppContext.Provider
       value={{
@@ -328,9 +265,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         getAllMuscles,
         getWorkoutsByMuscle,
         addWorkout,
-        getExercises,
         authToken,
-        addExercise,
       }}
     >
       {children}

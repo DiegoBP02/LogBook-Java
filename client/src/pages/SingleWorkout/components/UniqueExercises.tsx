@@ -1,11 +1,8 @@
-import {
-  ExerciseProps,
-  WorkoutProps,
-  useAppContext,
-} from "../context/appContext";
+import { WorkoutProps, useAppContext } from "../../../context/appContext";
 import moment from "moment";
-import { FindNearestWorkout } from "../utils";
+import { FindNearestWorkout } from "../../../utils";
 import { useState } from "react";
+import { ExerciseDBProps } from "../context/exerciseContext";
 
 interface UniqueExercisesProps {
   workouts: WorkoutProps[];
@@ -19,6 +16,8 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
   const [uniqueOldWorkouts, setUniqueOldWorkouts] = useState<string[]>();
   const [uniqueCurrentWorkouts, setUniqueCurrentWorkouts] =
     useState<string[]>();
+  const [showUniqueExercises, setShowUniqueExercises] =
+    useState<boolean>(false);
 
   const { authToken } = useAppContext();
   const nearestOldWorkout = FindNearestWorkout({ workouts, currentWorkout }) as
@@ -36,7 +35,9 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
       `/workouts/uniqueOldExercises/${nearestOldWorkout?.id}/${currentWorkout.id}`
     );
 
-    setUniqueOldWorkouts(data.map((exercise: ExerciseProps) => exercise.name));
+    setUniqueOldWorkouts(
+      data.map((exercise: ExerciseDBProps) => exercise.name)
+    );
   };
 
   const getUniqueCurrentWorkoutExercises = async () => {
@@ -51,7 +52,7 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
     );
 
     setUniqueCurrentWorkouts(
-      data.map((exercise: ExerciseProps) => exercise.name)
+      data.map((exercise: ExerciseDBProps) => exercise.name)
     );
   };
 
@@ -64,48 +65,51 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+      <div style={{ textAlign: "center" }}>
         <button
           onClick={() => {
             getUniqueOldWorkoutExercises();
             getUniqueCurrentWorkoutExercises();
+            setShowUniqueExercises(!showUniqueExercises);
           }}
           className="btn"
         >
           Get Unique Workout Exercises (Compare to {formattedDate} workout)
         </button>
       </div>
-      {((uniqueOldWorkouts && uniqueOldWorkouts.length === 0) ||
-        uniqueOldWorkouts === undefined) &&
-      ((uniqueCurrentWorkouts && uniqueCurrentWorkouts.length === 0) ||
-        uniqueCurrentWorkouts === undefined) ? null : (
-        <>
-          <article
-            className="propertiesUniqueExercises marginBottom"
-            style={{ paddingBottom: "1rem" }}
-          >
-            <p>Unique Old Workout Exercises</p>
-            <p>Unique Current Workout Exercises</p>
-          </article>
-          {((uniqueOldWorkouts && uniqueOldWorkouts.length > 0) ||
-            (uniqueCurrentWorkouts && uniqueCurrentWorkouts.length > 0)) && (
-            <div className="propertiesUniqueExercises">
-              <div>
-                {uniqueOldWorkouts &&
-                  uniqueOldWorkouts.map((exercise, index) => (
-                    <p key={index}>{exercise}</p>
-                  ))}
+      {showUniqueExercises ? (
+        ((uniqueOldWorkouts && uniqueOldWorkouts.length === 0) ||
+          uniqueOldWorkouts === undefined) &&
+        ((uniqueCurrentWorkouts && uniqueCurrentWorkouts.length === 0) ||
+          uniqueCurrentWorkouts === undefined) ? null : (
+          <>
+            <article
+              className="propertiesUniqueExercises marginBottom"
+              style={{ padding: "1rem 0" }}
+            >
+              <p>Unique Old Workout Exercises</p>
+              <p>Unique Current Workout Exercises</p>
+            </article>
+            {((uniqueOldWorkouts && uniqueOldWorkouts.length > 0) ||
+              (uniqueCurrentWorkouts && uniqueCurrentWorkouts.length > 0)) && (
+              <div className="propertiesUniqueExercises">
+                <div>
+                  {uniqueOldWorkouts &&
+                    uniqueOldWorkouts.map((exercise, index) => (
+                      <p key={index}>{exercise}</p>
+                    ))}
+                </div>
+                <div>
+                  {uniqueCurrentWorkouts &&
+                    uniqueCurrentWorkouts.map((exercise, index) => (
+                      <p key={index}>{exercise}</p>
+                    ))}
+                </div>
               </div>
-              <div>
-                {uniqueCurrentWorkouts &&
-                  uniqueCurrentWorkouts.map((exercise, index) => (
-                    <p key={index}>{exercise}</p>
-                  ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )
+      ) : null}
     </div>
   );
 };
