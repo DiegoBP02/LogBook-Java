@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -84,8 +85,8 @@ public class WorkoutController {
     }
 
     @GetMapping(value = "/volumeLoad/{id}")
-    public ResponseEntity<HashMap<String, Integer>> getVolumeLoad(@PathVariable UUID id) {
-        HashMap<String, Integer> result = workoutService.calculateVolumeLoad(id);
+    public ResponseEntity<HashMap<String, BigDecimal>> getVolumeLoad(@PathVariable UUID id) {
+        HashMap<String, BigDecimal> result = workoutService.calculateVolumeLoad(id);
         return ResponseEntity.ok().body(result);
     }
 
@@ -99,20 +100,20 @@ public class WorkoutController {
     }
 
     @GetMapping(value = "/uniqueOldExercises/{oldWorkoutId}/{currentWorkoutId}")
-    public ResponseEntity<List<Exercise>> getUniqueOldWorkoutExercises
+    public ResponseEntity<List<Exercise>> getUniqueWorkoutExercises
             (@PathVariable UUID oldWorkoutId,
              @PathVariable UUID currentWorkoutId) {
         List<Exercise> result =
-                workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+                workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId);
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping(value = "/uniqueCurrentExercises/{oldWorkoutId}/{currentWorkoutId}")
+    @GetMapping(value = "/uniqueCurrentExercises/{currentWorkoutId}/{oldWorkoutId}")
     public ResponseEntity<List<Exercise>> getUniqueCurrentWorkoutExercises
-            (@PathVariable UUID oldWorkoutId,
-             @PathVariable UUID currentWorkoutId) {
+            (@PathVariable UUID currentWorkoutId,
+             @PathVariable UUID oldWorkoutId) {
         List<Exercise> result =
-                workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, false);
+                workoutService.getUniqueWorkoutExercises(currentWorkoutId, oldWorkoutId);
         return ResponseEntity.ok().body(result);
     }
 

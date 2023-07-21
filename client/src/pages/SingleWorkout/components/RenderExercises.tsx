@@ -90,8 +90,7 @@ const RenderExercises = ({ currentWorkout }: RenderExercisesProps) => {
                 </p>
                 {nearestExercises && previousExercise ? (
                   <p>
-                    {previousExercise?.name} ({previousExercise?.reps} x{" "}
-                    {previousExercise?.weight})
+                    ({previousExercise?.reps} x {previousExercise?.weight})
                   </p>
                 ) : (
                   <p></p>

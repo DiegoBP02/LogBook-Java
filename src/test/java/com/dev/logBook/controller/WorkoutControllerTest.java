@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -59,7 +60,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
             .build();
     ExerciseDto EXERCISE_DTO_RECORD = ExerciseDto.builder()
             .name("name")
-            .weight(50)
+            .weight(BigDecimal.valueOf(50))
             .reps(10)
             .rir(0)
             .build();
@@ -489,7 +490,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     @WithMockUser
     @DisplayName("should return a list of exercises")
     void getVolumeLoad_success() throws Exception {
-        HashMap<String, Integer> expectedResult = new HashMap<>();
+        HashMap<String, BigDecimal> expectedResult = new HashMap<>();
         when(workoutService.calculateVolumeLoad(any(UUID.class)))
                 .thenReturn(expectedResult);
 
@@ -650,7 +651,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     void getUniqueOldWorkoutExercises_success() throws Exception {
         List<Exercise> expectedResult = new ArrayList<>();
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(true)))
+                (any(UUID.class), any(UUID.class)))
                 .thenReturn(expectedResult);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -663,7 +664,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -671,7 +672,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     @DisplayName("should throw ResourceNotFoundException if no workout is found")
     void getUniqueOldWorkoutExercises_noExerciseFound() throws Exception {
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(true)))
+                (any(UUID.class), any(UUID.class)))
                 .thenThrow(ResourceNotFoundException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -686,7 +687,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                                 instanceof ResourceNotFoundException));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -695,7 +696,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
             "if user is not the owner of the workout")
     void getUniqueOldWorkoutExercises_invalidCheckOwnership() throws Exception {
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(true)))
+                (any(UUID.class), any(UUID.class)))
                 .thenThrow(UnauthorizedAccessException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -710,7 +711,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                                 instanceof UnauthorizedAccessException));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -727,7 +728,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                         ("Access Denied", result.getResponse().getErrorMessage()));
 
         verify(workoutService, never())
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(true));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -736,7 +737,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     void getUniqueCurrentWorkoutExercises_success() throws Exception {
         List<Exercise> expectedResult = new ArrayList<>();
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(false)))
+                (any(UUID.class), any(UUID.class)))
                 .thenReturn(expectedResult);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -749,7 +750,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedResult)));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -757,7 +758,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
     @DisplayName("should throw ResourceNotFoundException if no workout is found")
     void getUniqueCurrentWorkoutExercises_noExerciseFound() throws Exception {
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(false)))
+                (any(UUID.class), any(UUID.class)))
                 .thenThrow(ResourceNotFoundException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -772,7 +773,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                                 instanceof ResourceNotFoundException));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -781,7 +782,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
             "if user is not the owner of the workout")
     void getUniqueCurrentWorkoutExercises_invalidCheckOwnership() throws Exception {
         when(workoutService.getUniqueWorkoutExercises
-                (any(UUID.class), any(UUID.class), eq(false)))
+                (any(UUID.class), any(UUID.class)))
                 .thenThrow(UnauthorizedAccessException.class);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
@@ -796,7 +797,7 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                                 instanceof UnauthorizedAccessException));
 
         verify(workoutService, times(1))
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
 
     @Test
@@ -813,8 +814,9 @@ class WorkoutControllerTest extends ApplicationConfigTest {
                         ("Access Denied", result.getResponse().getErrorMessage()));
 
         verify(workoutService, never())
-                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class), eq(false));
+                .getUniqueWorkoutExercises(any(UUID.class), any(UUID.class));
     }
+
 
     @Test
     @WithMockUser
@@ -994,6 +996,4 @@ class WorkoutControllerTest extends ApplicationConfigTest {
         verify(workoutService, never())
                 .delete(any(UUID.class));
     }
-
-
 }

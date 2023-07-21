@@ -1,6 +1,6 @@
 import React, { useContext, useReducer } from "react";
 import reducer, { Action } from "./exerciseReducer";
-import { WorkoutProps, useAppContext } from "../../../context/appContext";
+import { useAppContext } from "../../../context/appContext";
 
 export interface ExerciseValuesProps {
   name: string;

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class Exercise {
     private UUID id;
     private String name;
     private int reps;
-    private int weight;
+    private BigDecimal weight;
     private int rir;
     @Column(name = "created_at", updatable = false)
     private Long createdAt;
@@ -38,7 +39,7 @@ public class Exercise {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Exercise(UUID id, String name, int reps, int weight, int rir) {
+    public Exercise(UUID id, String name, int reps, BigDecimal weight, int rir) {
         this.id = id;
         this.name = name;
         this.reps = reps;

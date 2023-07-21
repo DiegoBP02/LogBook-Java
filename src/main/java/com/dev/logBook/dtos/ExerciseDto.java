@@ -1,14 +1,12 @@
 package com.dev.logBook.dtos;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -27,7 +25,8 @@ public class ExerciseDto {
     @NotNull
     @Min(0)
     @Max(1500)
-    private int weight;
+    @Digits(integer = 4, fraction = 3)
+    private BigDecimal weight;
     @Min(0)
     @Max(10)
     private int rir;

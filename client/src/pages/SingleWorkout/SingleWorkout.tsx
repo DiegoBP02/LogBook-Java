@@ -20,7 +20,6 @@ const SingleWorkout = () => {
   const {
     values,
     loading,
-    nearestExercises,
     setLoadingFalse,
     addExercise,
     exercises,
@@ -90,11 +89,8 @@ const SingleWorkout = () => {
         <RenderExercises currentWorkout={currentWorkout} />
       )}
       <SingleExerciseForm handleSubmit={handleSubmit} />
-      <GetPreviousWorkoutExercises
-        nearestExercises={nearestExercises}
-        nearestOldWorkout={nearestOldWorkout}
-      />
-      <UniqueExercises workouts={workouts} currentWorkout={currentWorkout} />
+      <GetPreviousWorkoutExercises nearestOldWorkout={nearestOldWorkout} />
+      <UniqueExercises currentWorkout={currentWorkout} />
       <RemoveWorkoutButton currentWorkoutMuscle={currentWorkout.muscle} />
     </Wrapper>
   );

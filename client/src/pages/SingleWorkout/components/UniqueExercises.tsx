@@ -5,12 +5,10 @@ import { useState } from "react";
 import { ExerciseDBProps } from "../context/exerciseContext";
 
 interface UniqueExercisesProps {
-  workouts: WorkoutProps[];
   currentWorkout: WorkoutProps;
 }
 
 const UniqueExercises: React.FC<UniqueExercisesProps> = ({
-  workouts,
   currentWorkout,
 }: UniqueExercisesProps) => {
   const [uniqueOldWorkouts, setUniqueOldWorkouts] = useState<string[]>();
@@ -18,6 +16,7 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
     useState<string[]>();
   const [showUniqueExercises, setShowUniqueExercises] =
     useState<boolean>(false);
+  const { workouts } = useAppContext();
 
   const { authToken } = useAppContext();
   const nearestOldWorkout = FindNearestWorkout({ workouts, currentWorkout }) as
@@ -48,7 +47,7 @@ const UniqueExercises: React.FC<UniqueExercisesProps> = ({
       return;
     }
     const { data } = await authToken.get(
-      `/workouts/uniqueCurrentExercises/${nearestOldWorkout?.id}/${currentWorkout.id}`
+      `/workouts/uniqueCurrentExercises/${currentWorkout?.id}/${nearestOldWorkout.id}`
     );
 
     setUniqueCurrentWorkouts(

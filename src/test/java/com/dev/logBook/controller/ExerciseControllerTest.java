@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +52,7 @@ class ExerciseControllerTest extends ApplicationConfigTest {
             .build();
     ExerciseDto EXERCISE_DTO_RECORD = ExerciseDto.builder()
             .name("name")
-            .weight(50)
+            .weight(BigDecimal.valueOf(50))
             .reps(10)
             .rir(0)
             .build();

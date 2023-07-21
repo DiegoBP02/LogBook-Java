@@ -7,15 +7,14 @@ import {
 } from "../context/exerciseContext";
 
 interface GetPreviousWorkoutExercisesProps {
-  nearestExercises: ExerciseDBProps[] | undefined;
   nearestOldWorkout: WorkoutProps | undefined;
 }
 
 const GetPreviousWorkoutExercises = ({
-  nearestExercises,
   nearestOldWorkout,
 }: GetPreviousWorkoutExercisesProps) => {
-  const { addExercise, currentWorkoutId } = useExerciseContext();
+  const { addExercise, currentWorkoutId, nearestExercises } =
+    useExerciseContext();
 
   const momentObject = moment(nearestOldWorkout?.date);
   const formattedDate = momentObject.format("DD/MM/YYYY");

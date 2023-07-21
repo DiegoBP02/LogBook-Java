@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TokenServiceTest extends ApplicationConfigTest {
+
     @Autowired
     TokenService tokenService;
     User USER_RECORD = new User("username", "email", "password", Role.ROLE_USER);
@@ -92,7 +93,7 @@ class TokenServiceTest extends ApplicationConfigTest {
 
         DecodedJWT decodedToken = JWT.decode(token);
         Date expiration = decodedToken.getExpiresAt();
-        Date expectedExpiration = Date.from(LocalDateTime.now().plusDays(1)
+        Date expectedExpiration = Date.from(LocalDateTime.now().plusSeconds(tokenExpiration)
                 .toInstant(ZoneOffset.of("-03:00")));
 
         // Potential timing variations in test execution

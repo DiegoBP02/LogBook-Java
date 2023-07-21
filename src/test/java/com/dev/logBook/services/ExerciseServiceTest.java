@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +45,7 @@ class ExerciseServiceTest extends ApplicationConfigTest {
             .build();
     ExerciseDto EXERCISE_DTO_RECORD = ExerciseDto.builder()
             .name("name")
-            .weight(50)
+            .weight(BigDecimal.valueOf(50))
             .reps(10)
             .rir(0)
             .workoutId(WORKOUT_RECORD.getId())

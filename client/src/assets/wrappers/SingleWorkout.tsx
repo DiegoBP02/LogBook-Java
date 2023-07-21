@@ -47,7 +47,8 @@ const Wrapper = styled.div`
 
   .propertiesUniqueExercises p {
     text-align: center;
-    overflow-x: scroll;
+    overflow-x: auto;
+    max-width: 150px;
   }
 
   .properties input {
@@ -68,9 +69,13 @@ const Wrapper = styled.div`
     gap: 1rem;
   }
 
+  .nameInput {
+    overflow-x: auto;
+    max-width: 15rem;
+  }
+
   @media (max-width: 992px) {
     .nameInput {
-      overflow-x: auto;
       max-width: 100px;
     }
   }

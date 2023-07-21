@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -52,7 +53,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
             .build();
     ExerciseDto EXERCISE_DTO_RECORD = ExerciseDto.builder()
             .name("name")
-            .weight(50)
+            .weight(BigDecimal.valueOf(50))
             .reps(10)
             .rir(0)
             .workoutId(WORKOUT_RECORD.getId())
@@ -114,7 +115,6 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
         verify(workoutRepository, times(1)).save(any(Workout.class));
     }
-
 
     @Test
     @DisplayName("should return a list of workouts")
@@ -351,7 +351,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     void calculateVolumeLoad_successful() throws Exception {
         Exercise EXERCISE_RECORD_2 = Exercise.builder()
                 .name(EXERCISE_DTO_RECORD.getName())
-                .weight(EXERCISE_DTO_RECORD.getWeight() + 5)
+                .weight(EXERCISE_DTO_RECORD.getWeight().add(BigDecimal.valueOf(5)))
                 .reps(EXERCISE_DTO_RECORD.getReps() + 5)
                 .rir(EXERCISE_DTO_RECORD.getRir())
                 .workout(WORKOUT_RECORD)
@@ -360,7 +360,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
         Exercise EXERCISE_RECORD_3 = Exercise.builder()
                 .name("random name")
-                .weight(EXERCISE_DTO_RECORD.getWeight() + 5)
+                .weight(EXERCISE_DTO_RECORD.getWeight().add(BigDecimal.valueOf(5)))
                 .reps(EXERCISE_DTO_RECORD.getReps() + 5)
                 .rir(EXERCISE_DTO_RECORD.getRir())
                 .workout(WORKOUT_RECORD)
@@ -372,17 +372,20 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
         WORKOUT_RECORD.setExercises(exercises);
 
-        HashMap<String, Integer> expectedHashMap = new HashMap<>();
+        HashMap<String, BigDecimal> expectedHashMap = new HashMap<>();
         expectedHashMap.put(EXERCISE_RECORD.getName(),
-                EXERCISE_RECORD.getReps() * EXERCISE_RECORD.getWeight()
-                        + EXERCISE_RECORD_2.getReps() * EXERCISE_RECORD_2.getWeight());
+                BigDecimal.valueOf(EXERCISE_RECORD.getReps())
+                        .multiply(EXERCISE_RECORD.getWeight())
+                        .add(BigDecimal.valueOf(EXERCISE_RECORD_2.getReps())
+                                .multiply(EXERCISE_RECORD_2.getWeight())));
         expectedHashMap.put(EXERCISE_RECORD_3.getName(),
-                EXERCISE_RECORD_3.getReps() * EXERCISE_RECORD_3.getWeight());
+                BigDecimal.valueOf(EXERCISE_RECORD_3.getReps())
+                        .multiply(EXERCISE_RECORD_3.getWeight()));
 
         when(workoutRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
-        HashMap<String, Integer> result = workoutService.calculateVolumeLoad(UUID.randomUUID());
+        HashMap<String, BigDecimal> result = workoutService.calculateVolumeLoad(UUID.randomUUID());
 
         assertEquals(expectedHashMap, result);
 
@@ -430,7 +433,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
                 .build();
         Exercise EXERCISE_RECORD_3 = Exercise.builder()
                 .name(EXERCISE_DTO_RECORD.getName())
-                .weight(EXERCISE_DTO_RECORD.getWeight() + 1)
+                .weight(EXERCISE_DTO_RECORD.getWeight().add(BigDecimal.ONE))
                 .reps(EXERCISE_DTO_RECORD.getReps() + 2)
                 .rir(EXERCISE_DTO_RECORD.getRir() + 3)
                 .workout(WORKOUT_RECORD)
@@ -446,7 +449,8 @@ class WorkoutServiceTest extends ApplicationConfigTest {
         ExerciseComparator exerciseComparator = ExerciseComparator.builder()
                 .name(EXERCISE_RECORD_3.getName())
                 .repsDifference(EXERCISE_RECORD_3.getReps() - EXERCISE_RECORD.getReps())
-                .weightDifference(EXERCISE_RECORD_3.getWeight() - EXERCISE_RECORD.getWeight())
+                .weightDifference(EXERCISE_RECORD_3.getWeight()
+                        .subtract(EXERCISE_RECORD.getWeight()))
                 .rirDifference(EXERCISE_RECORD_3.getRir() - EXERCISE_RECORD.getRir())
                 .build();
 
@@ -540,7 +544,7 @@ class WorkoutServiceTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("should return a list with the unique exercises of the current workout")
-    void getUniqueWorkoutExercises_successfulCurrentWorkout() throws Exception {
+    void getUniqueWorkoutExercises_successful() throws Exception {
         UUID oldWorkoutId = UUID.randomUUID();
         UUID currentWorkoutId = UUID.randomUUID();
         WORKOUT_RECORD.setExercises(Collections.singletonList(EXERCISE_RECORD));
@@ -554,39 +558,13 @@ class WorkoutServiceTest extends ApplicationConfigTest {
                 .exercises(exercises)
                 .build();
 
-        when(workoutRepository.findById(oldWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD));
         when(workoutRepository.findById(currentWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD_2));
+        when(workoutRepository.findById(oldWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD));
 
         List<Exercise> expectedResult = Collections.singletonList(EXERCISE_RECORD_2);
 
-        List<Exercise> result = workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, false);
-
-        assertEquals(expectedResult, result);
-
-        verify(workoutRepository, times(2)).findById(any(UUID.class));
-    }
-
-    @Test
-    @DisplayName("should throw return a list with the unique exercises of the old workout")
-    void getUniqueWorkoutExercises_successfulOldWorkout() throws Exception {
-        UUID oldWorkoutId = UUID.randomUUID();
-        UUID currentWorkoutId = UUID.randomUUID();
-        WORKOUT_RECORD.setExercises(Collections.singletonList(EXERCISE_RECORD));
-
-        Exercise EXERCISE_RECORD_2 = Exercise.builder()
-                .name("random")
-                .build();
-        Workout WORKOUT_RECORD_2 = Workout.builder()
-                .user(USER_RECORD)
-                .exercises(Collections.singletonList(EXERCISE_RECORD_2))
-                .build();
-
-        when(workoutRepository.findById(oldWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD));
-        when(workoutRepository.findById(currentWorkoutId)).thenReturn(Optional.of(WORKOUT_RECORD_2));
-
-        List<Exercise> expectedResult = Collections.singletonList(EXERCISE_RECORD);
-
-        List<Exercise> result = workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+        List<Exercise> result =
+                workoutService.getUniqueWorkoutExercises(currentWorkoutId, oldWorkoutId);
 
         assertEquals(expectedResult, result);
 
@@ -596,12 +574,12 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw ResourceNotFoundException if no workout is found" +
             "for oldWorkoutExercises")
-    void getUniqueWorkoutExercises_noWorkoutFoundOldWorkoutExercises() throws Exception {
+    void getUniqueWorkoutExercises_noWorkoutFoundPreservedExercises() throws Exception {
         when(workoutRepository.findById(UUID.randomUUID()))
                 .thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID());
         });
 
         verify(workoutRepository, times(1)).findById(any(UUID.class));
@@ -610,18 +588,17 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw ResourceNotFoundException if no workout is found" +
             "for currentWorkoutExercises")
-    void getUniqueWorkoutExercises_noWorkoutFoundCurrentWorkoutExercises() throws Exception {
+    void getUniqueWorkoutExercises_noWorkoutFoundComparisonExercises() throws Exception {
         UUID oldWorkoutId = UUID.randomUUID();
         UUID currentWorkoutId = UUID.randomUUID();
 
         when(workoutRepository.findById(oldWorkoutId))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
-
         when(workoutRepository.findById(currentWorkoutId))
                 .thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId, true);
+            workoutService.getUniqueWorkoutExercises(oldWorkoutId, currentWorkoutId);
         });
 
         verify(workoutRepository, times(2)).findById(any(UUID.class));
@@ -630,34 +607,35 @@ class WorkoutServiceTest extends ApplicationConfigTest {
     @Test
     @DisplayName("should throw UnauthorizedAccessException " +
             "if user is not the owner of the old workout")
-    void getUniqueWorkoutExercises_invalidOldWorkoutExercisesCheckOwnership() throws Exception {
+    void getUniqueWorkoutExercises_invalidPreservedExercisesCheckOwnership() throws Exception {
         when(authentication.getPrincipal())
-                .thenReturn(USER_RECORD)
                 .thenReturn(USER_RECORD_2);
 
         when(workoutRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
         assertThrows(UnauthorizedAccessException.class, () -> {
-            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID());
         });
 
-        verify(workoutRepository, times(2)).findById(any(UUID.class));
+        verify(workoutRepository, times(1)).findById(any(UUID.class));
     }
 
     @Test
     @DisplayName("should throw UnauthorizedAccessException " +
             "if user is not the owner of the current workout")
-    void getUniqueWorkoutExercises_invalidCurrentWorkoutExercisesCheckOwnership() throws Exception {
-        when(authentication.getPrincipal()).thenReturn(USER_RECORD_2);
+    void getUniqueWorkoutExercises_invalidComparisonExercisesCheckOwnership() throws Exception {
+        when(authentication.getPrincipal())
+                .thenReturn(USER_RECORD)
+                .thenReturn(USER_RECORD_2);
         when(workoutRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.of(WORKOUT_RECORD));
 
         assertThrows(UnauthorizedAccessException.class, () -> {
-            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID(), true);
+            workoutService.getUniqueWorkoutExercises(UUID.randomUUID(), UUID.randomUUID());
         });
 
-        verify(workoutRepository, times(1)).findById(any(UUID.class));
+        verify(workoutRepository, times(2)).findById(any(UUID.class));
     }
 
     @Test

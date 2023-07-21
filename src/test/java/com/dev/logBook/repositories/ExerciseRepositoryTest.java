@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +53,7 @@ class ExerciseRepositoryTest {
 
         Exercise EXERCISE_RECORD = Exercise.builder()
                 .name("name")
-                .weight(50)
+                .weight(BigDecimal.valueOf(50))
                 .reps(10)
                 .rir(0)
                 .workout(WORKOUT_RECORD)

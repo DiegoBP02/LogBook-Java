@@ -1,26 +1,6 @@
 import React, { useContext, useReducer } from "react";
-import reducer, { ActionType } from "./reducer";
-import {
-  ADD_WORKOUT_BEGIN,
-  ADD_WORKOUT_ERROR,
-  ADD_WORKOUT_SUCCESS,
-  CLEAR_ALERT,
-  DISPLAY_ALERT,
-  GET_MUSCLES_BEGIN,
-  GET_MUSCLES_ERROR,
-  GET_MUSCLES_SUCCESS,
-  GET_WORKOUTS_BY_MUSCLE_BEGIN,
-  GET_WORKOUTS_BY_MUSCLE_SUCCESS,
-  GET_WORKOUTS_BY_MUSCLE_ERROR,
-  LOGOUT_USER,
-  SETUP_USER_BEGIN,
-  SETUP_USER_ERROR,
-  SETUP_USER_SUCCESS,
-} from "./actions";
-
+import reducer, { Action } from "./reducer";
 import axios, { AxiosInstance } from "axios";
-
-const token = localStorage.getItem("token");
 
 export interface CurrentUserProps {
   username: string;
@@ -85,9 +65,9 @@ export const initialState: InitialStateProps = {
   alertType: "",
   clearAlert: () => {},
   setupUser: async () => {},
-  userToken: token || "",
+  userToken: localStorage.getItem("token") || "",
   userLoading: false,
-  username: "",
+  username: localStorage.getItem("username") || "",
   isLoading: false,
   logoutUser: async () => {},
   getAllMuscles: async () => {},
@@ -106,7 +86,7 @@ type AppProviderProps = {
 
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer<
-    React.Reducer<InitialStateProps, ActionType>
+    React.Reducer<InitialStateProps, Action>
   >(reducer, initialState);
 
   const authFetch = axios.create({
@@ -146,13 +126,13 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   );
 
   const displayAlert = () => {
-    dispatch({ type: DISPLAY_ALERT });
+    dispatch({ type: "DISPLAY_ALERT" });
     clearAlert();
   };
 
   const clearAlert = () => {
     setTimeout(() => {
-      dispatch({ type: CLEAR_ALERT });
+      dispatch({ type: "CLEAR_ALERT" });
     }, 3000);
   };
 
@@ -161,48 +141,50 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     endPoint,
     alertText,
   }: SetupUserProps) => {
-    dispatch({ type: SETUP_USER_BEGIN });
+    dispatch({ type: "SETUP_USER_BEGIN" });
 
     try {
       const { data } = await authFetch.post(`/auth/${endPoint}`, currentUser);
       dispatch({
-        type: SETUP_USER_SUCCESS,
+        type: "SETUP_USER_SUCCESS",
         payload: { token: data, alertText, username: currentUser.username },
       });
-      addTokenToLocalStorage(data);
+      addToLocalStorage("token", data);
+      addToLocalStorage("username", currentUser.username);
     } catch (error: any) {
       dispatch({
-        type: SETUP_USER_ERROR,
+        type: "SETUP_USER_ERROR",
         payload: { message: error.response.data.message },
       });
     }
     clearAlert();
   };
 
-  const addTokenToLocalStorage = (token: string) => {
-    localStorage.setItem("token", token);
+  const addToLocalStorage = (key: string, value: string) => {
+    localStorage.setItem(key, value);
   };
 
-  const removeTokenFromLocalStorage = () => {
-    localStorage.removeItem("token");
+  const removeFromLocalStorage = (key: string) => {
+    localStorage.removeItem(key);
   };
 
   const logoutUser = async () => {
-    dispatch({ type: LOGOUT_USER });
-    removeTokenFromLocalStorage();
+    dispatch({ type: "LOGOUT_USER" });
+    removeFromLocalStorage("token");
+    removeFromLocalStorage("username");
   };
 
   const getAllMuscles = async () => {
-    dispatch({ type: GET_MUSCLES_BEGIN });
+    dispatch({ type: "GET_MUSCLES_BEGIN" });
     try {
       const { data } = await authToken.get("/muscles");
       dispatch({
-        type: GET_MUSCLES_SUCCESS,
+        type: "GET_MUSCLES_SUCCESS",
         payload: data,
       });
     } catch (error: any) {
       dispatch({
-        type: GET_MUSCLES_ERROR,
+        type: "GET_MUSCLES_ERROR",
         payload: { message: error.response.data.message },
       });
     }
@@ -210,10 +192,10 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const getWorkoutsByMuscle = async (muscle: string) => {
-    dispatch({ type: GET_WORKOUTS_BY_MUSCLE_BEGIN });
+    dispatch({ type: "GET_WORKOUTS_BY_MUSCLE_BEGIN" });
     try {
       const { data } = await authToken.get(`/workouts/muscle/${muscle}`);
-      const musclesData = data.map(
+      const musclesData: WorkoutProps[] = data.map(
         ({
           date,
           id,
@@ -229,10 +211,13 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         })
       );
 
-      dispatch({ type: GET_WORKOUTS_BY_MUSCLE_SUCCESS, payload: musclesData });
+      dispatch({
+        type: "GET_WORKOUTS_BY_MUSCLE_SUCCESS",
+        payload: musclesData,
+      });
     } catch (error: any) {
       dispatch({
-        type: GET_WORKOUTS_BY_MUSCLE_ERROR,
+        type: "GET_WORKOUTS_BY_MUSCLE_ERROR",
         payload: { message: error.response.data.message },
       });
     }
@@ -240,14 +225,14 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const addWorkout = async (data: AddWorkoutProps) => {
-    dispatch({ type: ADD_WORKOUT_BEGIN });
+    dispatch({ type: "ADD_WORKOUT_BEGIN" });
     try {
       await authToken.post("/workouts", data);
-      dispatch({ type: ADD_WORKOUT_SUCCESS });
+      dispatch({ type: "ADD_WORKOUT_SUCCESS" });
       await getWorkoutsByMuscle(data.muscle);
     } catch (error: any) {
       dispatch({
-        type: ADD_WORKOUT_ERROR,
+        type: "ADD_WORKOUT_ERROR",
         payload: { message: error.response.data.message },
       });
     }

@@ -18,10 +18,7 @@ export type Action =
   | { type: "SET_NEAREST_EXERCISES"; payload: ExerciseDBProps[] | undefined }
   | { type: "SET_CURRENT_WORKOUT_ID"; payload: string };
 
-const reducer = (
-  state: InitialStateProps,
-  action: Action
-): InitialStateProps => {
+const reducer: React.Reducer<InitialStateProps, Action> = (state, action) => {
   switch (action.type) {
     case "GET_EXERCISES_BEGIN":
       return { ...state, isLoading: true };
@@ -47,7 +44,6 @@ const reducer = (
       return { ...state, nearestExercises: action.payload };
     case "SET_CURRENT_WORKOUT_ID":
       return { ...state, currentWorkoutId: action.payload };
-
     default:
       return state;
   }

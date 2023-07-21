@@ -14,11 +14,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.dev.logBook.services.utils.CheckOwnership.checkOwnership;
 
@@ -100,19 +98,19 @@ public class WorkoutService {
         return exercisesOutsideRepsRange;
     }
 
-    public HashMap<String, Integer> calculateVolumeLoad(UUID workoutId) {
+    public HashMap<String, BigDecimal> calculateVolumeLoad(UUID workoutId) {
         Workout workout = findById(workoutId);
         List<Exercise> exercises = workout.getExercises();
-        HashMap<String, Integer> result = new HashMap<>();
+        HashMap<String, BigDecimal> result = new HashMap<>();
         exercises.forEach(exercise -> {
             String name = exercise.getName();
-            int weight = exercise.getWeight();
+            BigDecimal weight = exercise.getWeight();
             int reps = exercise.getReps();
-            int volume = weight * reps;
+            BigDecimal volume = weight.multiply(BigDecimal.valueOf(reps));
 
             if (result.containsKey(name)) {
-                int previousVolume = result.get(name);
-                volume += previousVolume;
+                BigDecimal previousVolume = result.get(name);
+                volume = volume.add(previousVolume);
             }
 
             result.put(name, volume);
@@ -137,8 +135,10 @@ public class WorkoutService {
                         exerciseComparator.setRepsDifference(repsDifference);
                     }
 
-                    if (currentExercise.getWeight() != oldExercise.getWeight()) {
-                        int weightDifference = currentExercise.getWeight() - oldExercise.getWeight();
+                    if (!Objects.equals(currentExercise.getWeight(), oldExercise.getWeight())) {
+                        BigDecimal currentWeight = currentExercise.getWeight();
+                        BigDecimal oldWeight = oldExercise.getWeight();
+                        BigDecimal weightDifference = currentWeight.subtract(oldWeight);
                         exerciseComparator.setWeightDifference(weightDifference);
                     }
 
@@ -157,50 +157,35 @@ public class WorkoutService {
     }
 
     public List<Exercise> getUniqueWorkoutExercises
-            (UUID oldWorkoutId, UUID currentWorkoutId, boolean isOldWorkout) {
-        List<Exercise> workoutExercises = getExercisesFromWorkout(isOldWorkout ? oldWorkoutId : currentWorkoutId);
-        List<Exercise> otherWorkoutExercises = getExercisesFromWorkout(isOldWorkout ? currentWorkoutId : oldWorkoutId);
+            (UUID preservedExercises, UUID comparisonExercises) {
+        List<Exercise> mainWorkoutExercises = getExercisesFromWorkout(preservedExercises);
+        List<Exercise> comparisonWorkoutExercises = getExercisesFromWorkout(comparisonExercises);
 
-        List<Exercise> commonExercises =
-                getCommonExercises(workoutExercises, otherWorkoutExercises);
-
-        return removeExercisesInCommon(workoutExercises, commonExercises);
+        return getUniqueExercises(mainWorkoutExercises, comparisonWorkoutExercises);
     }
 
-    private List<Exercise> getExercisesFromWorkout(UUID workoutId) {
-        return findById(workoutId).getExercises();
-    }
+    private List<Exercise> getUniqueExercises
+            (List<Exercise> preservedExercises, List<Exercise> comparisonExercises) {
+        List<Exercise> exercises = new ArrayList<>(preservedExercises);
+        List<Exercise> otherExercises = new ArrayList<>(comparisonExercises);
 
-    private List<Exercise> getCommonExercises
-            (List<Exercise> workoutExercises, List<Exercise> otherWorkoutExercises) {
-        List<Exercise> commonExercises = new ArrayList<>();
-
-        for (Exercise oldExercise : workoutExercises) {
-            for (Exercise currentExercise : otherWorkoutExercises) {
-                if (oldExercise.getName().equalsIgnoreCase(currentExercise.getName())) {
-                    commonExercises.add(oldExercise);
+        Iterator<Exercise> iterator = exercises.iterator();
+        while (iterator.hasNext()) {
+            Exercise currentExercise = iterator.next();
+            for (Exercise exercise : otherExercises) {
+                if (exercise.getName().equalsIgnoreCase(currentExercise.getName())) {
+                    iterator.remove();
+                    otherExercises.remove(exercise);
                     break;
                 }
             }
         }
 
-        return commonExercises;
+        return exercises;
     }
 
-    private List<Exercise> removeExercisesInCommon
-            (List<Exercise> exercisesList, List<Exercise> commonExercises) {
-        List<Exercise> exercises = new ArrayList<>(exercisesList);
-
-        exercises.removeIf(currentExercise -> {
-            for (Exercise commonExercise : commonExercises) {
-                if (currentExercise.getName().equalsIgnoreCase(commonExercise.getName())) {
-                    return true;
-                }
-            }
-            return false;
-        });
-
-        return exercises;
+    private List<Exercise> getExercisesFromWorkout(UUID workoutId) {
+        return findById(workoutId).getExercises();
     }
 
     private User getCurrentUser() {
