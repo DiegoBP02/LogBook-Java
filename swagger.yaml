@@ -6,7 +6,7 @@ info:
     name: Diego
     url: https://portfolio-diegobp.netlify.app
     email: diegobpdev@gmail.com
-  version: "1.0"
+  version: '1.0'
 servers:
   - url: http://localhost:8080
     description: Local ENV
@@ -19,14 +19,14 @@ paths:
         - workout-controller
       operationId: findAll
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Workout"
+                  $ref: '#/components/schemas/Workout'
     post:
       tags:
         - workout-controller
@@ -35,29 +35,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WorkoutDto"
+              $ref: '#/components/schemas/WorkoutDto'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Workout"
+                $ref: '#/components/schemas/Workout'
   /exercises:
     get:
       tags:
         - exercise-controller
-      operationId: findAll_1
+      operationId: findAll_2
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Exercise"
+                  $ref: '#/components/schemas/Exercise'
     post:
       tags:
         - exercise-controller
@@ -66,15 +66,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExerciseDto"
+              $ref: '#/components/schemas/ExerciseDto'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Exercise"
+                $ref: '#/components/schemas/Exercise'
   /auth/register:
     post:
       tags:
@@ -84,13 +84,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterDTO"
+              $ref: '#/components/schemas/RegisterDTO'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: string
   /auth/login:
@@ -102,13 +102,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginDTO"
+              $ref: '#/components/schemas/LoginDTO'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: string
   /workouts/{id}:
@@ -124,12 +124,12 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Workout"
+                $ref: '#/components/schemas/Workout'
     delete:
       tags:
         - workout-controller
@@ -142,12 +142,12 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Workout"
+                $ref: '#/components/schemas/Workout'
     patch:
       tags:
         - workout-controller
@@ -163,15 +163,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WorkoutDto"
+              $ref: '#/components/schemas/WorkoutDto'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Workout"
+                $ref: '#/components/schemas/Workout'
   /exercises/{id}:
     get:
       tags:
@@ -185,12 +185,12 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Exercise"
+                $ref: '#/components/schemas/Exercise'
     delete:
       tags:
         - exercise-controller
@@ -203,12 +203,12 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Exercise"
+                $ref: '#/components/schemas/Exercise'
     patch:
       tags:
         - exercise-controller
@@ -224,15 +224,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExerciseDto"
+              $ref: '#/components/schemas/ExerciseDto'
         required: true
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Exercise"
+                $ref: '#/components/schemas/Exercise'
   /workouts/volumeLoad/{id}:
     get:
       tags:
@@ -246,20 +246,19 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: object
                 additionalProperties:
-                  type: integer
-                  format: int32
+                  type: number
   /workouts/uniqueOldExercises/{oldWorkoutId}/{currentWorkoutId}:
     get:
       tags:
         - workout-controller
-      operationId: getUniqueOldWorkoutExercises
+      operationId: getUniqueWorkoutExercises
       parameters:
         - name: oldWorkoutId
           in: path
@@ -274,41 +273,61 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Exercise"
-  /workouts/uniqueCurrentExercises/{oldWorkoutId}/{currentWorkoutId}:
+                  $ref: '#/components/schemas/Exercise'
+  /workouts/uniqueCurrentExercises/{currentWorkoutId}/{oldWorkoutId}:
     get:
       tags:
         - workout-controller
       operationId: getUniqueCurrentWorkoutExercises
       parameters:
-        - name: oldWorkoutId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
         - name: currentWorkoutId
           in: path
           required: true
           schema:
             type: string
             format: uuid
+        - name: oldWorkoutId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Exercise"
+                  $ref: '#/components/schemas/Exercise'
+  /workouts/muscle/{muscle}:
+    get:
+      tags:
+        - workout-controller
+      operationId: findWorkoutsByMuscle
+      parameters:
+        - name: muscle
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workout'
   /workouts/exercisesOutsideRepRange/{id}:
     get:
       tags:
@@ -322,14 +341,14 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Exercise"
+                  $ref: '#/components/schemas/Exercise'
   /workouts/date/{date}/{muscle}:
     get:
       tags:
@@ -348,12 +367,12 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: "#/components/schemas/Workout"
+                $ref: '#/components/schemas/Workout'
   /workouts/compareWorkouts/{oldWorkoutId}/{currentWorkoutId}:
     get:
       tags:
@@ -373,14 +392,38 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        '200':
           description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ExerciseComparator"
+                  $ref: '#/components/schemas/ExerciseComparator'
+  /muscles:
+    get:
+      tags:
+        - muscles-controller
+      operationId: findAll_1
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - CHEST
+                    - BACK
+                    - SHOULDERS
+                    - LEGS
+                    - BICEPS
+                    - TRICEPS
+                    - CALVES
+                    - ABDOMINAL
+                    - FULL_BODY
 components:
   schemas:
     WorkoutDto:
@@ -428,11 +471,13 @@ components:
           type: integer
           format: int32
         weight:
-          type: integer
-          format: int32
+          type: number
         rir:
           type: integer
           format: int32
+        createdAt:
+          type: integer
+          format: int64
     Workout:
       type: object
       properties:
@@ -463,12 +508,11 @@ components:
         exercises:
           type: array
           items:
-            $ref: "#/components/schemas/Exercise"
+            $ref: '#/components/schemas/Exercise'
     ExerciseDto:
       required:
         - name
         - reps
-        - rir
         - weight
         - workoutId
       type: object
@@ -486,8 +530,7 @@ components:
         weight:
           maximum: 1500
           minimum: 0
-          type: integer
-          format: int32
+          type: number
         rir:
           maximum: 10
           minimum: 0
@@ -533,8 +576,7 @@ components:
           type: integer
           format: int32
         weightDifference:
-          type: integer
-          format: int32
+          type: number
         rirDifference:
           type: integer
           format: int32
