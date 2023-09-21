@@ -32,6 +32,10 @@ const GetPreviousWorkoutExercises = ({
     });
   };
 
+  if (nearestOldWorkout === undefined) {
+    return null;
+  }
+
   return (
     <div className="center">
       <button

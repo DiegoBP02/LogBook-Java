@@ -15,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ExerciseDto {
     @NotBlank
+    @Pattern(regexp = ".*[a-zA-Z]{3,}.*", message = "Name must contain at least three letters")
     private String name;
     @NotNull
     private UUID workoutId;
