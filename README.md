@@ -73,14 +73,13 @@ Please exercise caution when modifying the `application.properties` file and ens
 ## Project Screenshots
 
 ### Authentication Page
-![Authentication Screenshot](![localhost_3000_auth(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/1198aad9-69b4-4965-bbbd-68d89b56ddd8))
+![localhost_3000_auth(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/1198aad9-69b4-4965-bbbd-68d89b56ddd8)
 
 ### Main Page
-![Main Page Screenshot](![localhost_3000_(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/3dcc1b5c-930a-4ae3-af42-37e56bcc0f33))
+![localhost_3000_(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/3dcc1b5c-930a-4ae3-af42-37e56bcc0f33)
 
 ### Add New Workout Page
-![Add New Workout Page Screenshot](![localhost_3000_(Nest Hub Max) (1)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/35d56ed4-7614-4a05-a93c-e48c4319bb1d))
+![localhost_3000_(Nest Hub Ma) (1)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/35d56ed4-7614-4a05-a93c-e48c4319bb1d)
 
 ### Single Workout Page
-![Single Workout Page Screenshot](![localhost_3000_singleWorkout_f7877675-4bdc-4fdf-8453-ab81db19f40f(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/1682c006-c332-4ca1-83fd-4ce28d6df1b8)
-)
+![localhost_3000_singleWorkout_f7877675-4bdc-4fdf-8453-ab81db19f40f(Nest Hub Max)](https://github.com/DiegoBP02/LogBook-Java/assets/103163622/1682c006-c332-4ca1-83fd-4ce28d6df1b8)
